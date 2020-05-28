@@ -11,7 +11,7 @@ This library allows you reading ORNO WE energy meter(s) using:
 - [x] Software Serial (<i>[library for ESP8266](https://github.com/plerup/espsoftwareserial)</i>)
 
 you also need rs232<->rs485 converter:
-- [x] with automatic flow direction control (<i>look at images below</i>) <b><i>or</i></b>
+- [x] with automatic flow direction control
 
 ---
 
