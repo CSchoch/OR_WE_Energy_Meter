@@ -102,14 +102,13 @@ public:
   uint16_t getCrc();
   uint16_t getCombinedCode();
 
-  uint8_t getErrCode(bool _clear = false);  //return last errorcode (optional clear this value, default flase)
-  void clearErrCode();                       //clear last errorcode
+  uint8_t getErrCode(bool _clear = false); //return last errorcode (optional clear this value, default flase)
+  void clearErrCode();                     //clear last errorcode
 
 private:
   // instantiate ModbusMaster object
   ModbusMaster _node;
-  uint8_t _result = _node.ku8MBSuccess; 
- 
+  uint8_t _result = _node.ku8MBSuccess;
 
   //OR_WE registers
   //Voltages
