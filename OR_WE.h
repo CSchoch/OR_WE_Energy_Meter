@@ -52,9 +52,9 @@ public:
 
   //Power Factor
   float getPowerFactorTotal();
-  float getPowerPowerFactorL1();
-  float getPowerPowerFactorL2();
-  float getPowerPowerFactorL3();
+  float getPowerFactorL1();
+  float getPowerFactorL2();
+  float getPowerFactorL3();
 
   //Counter
   float getTotalCounterActivePowerTotal();

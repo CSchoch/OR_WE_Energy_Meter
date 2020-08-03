@@ -438,7 +438,7 @@ float OR_WE::getPowerFactorTotal()
   }
     return result;
 }
-float OR_WE::getPowerPowerFactorL1()
+float OR_WE::getPowerFactorL1()
 {
   uint8_t j;
   uint16_t data[2];
@@ -458,7 +458,7 @@ float OR_WE::getPowerPowerFactorL1()
   }
     return result;
 }
-float OR_WE::getPowerPowerFactorL2()
+float OR_WE::getPowerFactorL2()
 {
   uint8_t j;
   uint16_t data[2];
@@ -478,7 +478,7 @@ float OR_WE::getPowerPowerFactorL2()
   }
     return result;
 }
-float OR_WE::getPowerPowerFactorL3()
+float OR_WE::getPowerFactorL3()
 {
   uint8_t j;
   uint16_t data[2];

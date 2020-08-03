@@ -86,11 +86,11 @@ void loop()
   Serial.print("Total: ");
   Serial.print(EnergyMeter.getPowerFactorTotal());
   Serial.print(" L1: ");
-  Serial.print(EnergyMeter.getPowerPowerFactorL1());
+  Serial.print(EnergyMeter.getPowerFactorL1());
   Serial.print(" L2: ");
-  Serial.print(EnergyMeter.getPowerPowerFactorL2());
+  Serial.print(EnergyMeter.getPowerFactorL2());
   Serial.print(" L3: ");
-  Serial.println(EnergyMeter.getPowerPowerFactorL3());
+  Serial.println(EnergyMeter.getPowerFactorL3());
 
   //Counter
   Serial.println("Counter Active Power");
