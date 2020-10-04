@@ -13,6 +13,41 @@
 #define OR_WE_SERIAL_MODE SERIAL_8E1
 
 //------------------------------------------------------------------------------
+struct TotalCounterTarif_t
+{
+  float	Total;
+  float	T1;
+  float	T2;
+  float	T3;
+  float	T4;
+};
+
+//------------------------------------------------------------------------------
+struct TarifConfigData_t
+{
+  uint8_t	Hour;
+  uint8_t	Minute;
+  uint8_t	TarifIndex;
+};
+
+struct TarifConfig_t
+{
+  TarifConfigData_t	Data[8];
+};
+
+//------------------------------------------------------------------------------
+struct HolidayConfigData_t
+{
+  uint8_t	Month;
+  uint8_t	Day;
+};
+
+struct HolidayConfig_t
+{
+  HolidayConfigData_t	Data[100];
+};
+
+//------------------------------------------------------------------------------
 class OR_WE
 {
 public:
@@ -30,6 +65,9 @@ protected:
 
   float getModbusFloat(uint16_t data[2]);
   uint32_t getModbusUint32(uint16_t data[2]);
+  tm getModbusTime(uint16_t data[4]);
+  TarifConfigData_t getModbusTarifConfig(uint16_t data[2]);
+  HolidayConfigData_t getModbusHolidayConfig(uint16_t data);
 };
 
 class OR_WE_SINGLE_PHASE : public OR_WE
@@ -37,7 +75,7 @@ class OR_WE_SINGLE_PHASE : public OR_WE
 public:
   OR_WE_SINGLE_PHASE();
 
-    //Voltage
+  //Voltage
   float getVoltage();
 
   //Frequency
@@ -59,8 +97,8 @@ public:
   float getPowerFactor();
 
   //Counter
-  float getTotalCounterActivePower();
-float getTotalCounterReactivePower();
+  TotalCounterTarif_t getTotalCounterActivePower();
+  TotalCounterTarif_t getTotalCounterReactivePower();
 
   //Other
   uint16_t getMeterId();
@@ -105,12 +143,12 @@ class OR_WE_SINGLE_PHASE_TARIF : public OR_WE_SINGLE_PHASE
 public:
   OR_WE_SINGLE_PHASE_TARIF();
 
- //Other
-float getWeekdayTarif ();
-    float getTotalWeekendTarif();
-  float getHolidayTarif();
-  float getHoliday();
-  float getDateTime();
+  //Other
+  TarifConfig_t getWeekdayTarif();
+  TarifConfig_t getTotalWeekendTarif();
+  TarifConfig_t getHolidayTarif();
+  HolidayConfig_t getHoliday();
+  tm getDateTime();
 
 protected:
   //OR_WE registers
@@ -263,7 +301,7 @@ protected:
   static const uint16_t RegisterTotalReactivePowerP1 = 0x011A;
   static const uint16_t RegisterTotalReactivePowerP2 = 0x011C;
   static const uint16_t RegisterTotalReactivePowerP3 = 0x011E;
-  static const uint16_t RegisterTotalReactivePowerSystemT1 = 0x0136; // Todo 
+  static const uint16_t RegisterTotalReactivePowerSystemT1 = 0x0136; // Todo
   static const uint16_t RegisterTotalReactivePowerSystemT2 = 0x0142; // Todo
   static const uint16_t RegisterTotalReactivePowerSystemT3 = 0x014E; // Todo
   static const uint16_t RegisterTotalReactivePowerSystemT4 = 0x015A; // Todo
@@ -318,7 +356,7 @@ protected:
   static const uint16_t RegisterCycleTime = 0x000D;
   static const uint16_t RegisterCrc = 0x0041;
   static const uint16_t RegisterCombinedCode = 0x0042;
-  static const uint16_t RegisterDateTime = 0x003C; // Todo
+  static const uint16_t RegisterDateTime = 0x003C;     // Todo
   static const uint16_t RegisterLcdCycleTine = 0x000D; // Todo
 };
 
@@ -343,6 +381,5 @@ protected:
   //Other
   static const uint16_t RegisterHolidayWeekendTarif = 0x000C;
   // Hier weiter
-
 };
 #endif //OR_WE_h

@@ -35,8 +35,6 @@ float OR_WE::getModbusFloat(uint16_t data[2])
   {
     byte b[4];
     uint16_t data[2];
-    float result = -1;
-
   } source;
 
   union u_tag
@@ -62,8 +60,6 @@ uint32_t OR_WE::getModbusUint32(uint16_t data[2])
   {
     byte b[4];
     uint16_t data[2];
-    float result = -1;
-
   } source;
 
   union u_tag
@@ -81,6 +77,65 @@ uint32_t OR_WE::getModbusUint32(uint16_t data[2])
   dest.b[1] = source.b[3];
 
   return dest.val;
+}
+
+tm OR_WE::getModbusTime(uint16_t data[4])
+{
+  union u_data
+  {
+    byte b[8];
+    uint16_t data[4];
+  } source;
+
+  tm dest;
+
+  source.data[0] = data[0];
+  source.data[1] = data[1];
+  source.data[2] = data[2];
+  source.data[3] = data[3];
+
+  dest.tm_mon = source.b[0];
+  dest.tm_mday = source.b[1];
+  dest.tm_year = source.b[2];
+  dest.tm_hour = source.b[3];
+  dest.tm_min = source.b[4];
+  dest.tm_sec = source.b[5];
+  dest.tm_wday = source.b[6];
+
+  return dest;
+}
+
+TarifConfigData_t OR_WE::getModbusTarifConfig(uint16_t data[2])
+{
+  union u_data
+  {
+    byte b[4];
+    uint16_t data[2];
+  } source;
+
+  TarifConfigData_t dest;
+
+  source.data[0] = data[0];
+  source.data[1] = data[1];
+
+  dest.Hour = source.b[0];
+  dest.Minute = source.b[1];
+  dest.TarifIndex = source.b[3];
+
+  return dest;
+}
+
+HolidayConfigData_t OR_WE::getModbusHolidayConfig(uint16_t data)
+{
+  union u_data
+  {
+    HolidayConfigData_t val;
+    uint16_t data;
+  } source;
+
+  source.data = data;
+
+  return source.val;
 }
 
 //------------------------------------------------------------------------------
@@ -1509,42 +1564,100 @@ float OR_WE_SINGLE_PHASE::getPowerFactor()
 }
 
 //Counter
-float OR_WE_SINGLE_PHASE::getTotalCounterActivePower()
+TotalCounterTarif_t OR_WE_SINGLE_PHASE::getTotalCounterActivePower()
 {
   uint8_t j;
+  uint8_t k;
   uint16_t data[2];
-  float result = -1;
+  TotalCounterTarif_t result;
 
-  _result = _node.readHoldingRegisters(RegisterTotalActivePower, 2);
+  _result = _node.readHoldingRegisters(RegisterTotalActivePower, 10);
 
   // do something with data if read is successful
   if (_result == _node.ku8MBSuccess)
   {
-    for (j = 0; j < 2; j++)
+    k = 0;
+    for (j = 0; j < 10; j++)
     {
-      data[j] = _node.getResponseBuffer(j);
+      data[k] = _node.getResponseBuffer(j);
+      k++;
+      switch (j)
+      {
+      case 1:
+        result.Total = getModbusFloat(data);
+        k = 0;
+        break;
+
+      case 3:
+        result.T1 = getModbusFloat(data);
+        k = 0;
+        break;
+
+      case 5:
+        result.T2 = getModbusFloat(data);
+        k = 0;
+        break;
+
+      case 7:
+        result.T3 = getModbusFloat(data);
+        k = 0;
+        break;
+
+      case 9:
+        result.T4 = getModbusFloat(data);
+        k = 0;
+        break;
+      }
     }
-    result = getModbusFloat(data);
   }
   return result;
 }
 
-float OR_WE_SINGLE_PHASE::getTotalCounterReactivePower()
+TotalCounterTarif_t OR_WE_SINGLE_PHASE::getTotalCounterReactivePower()
 {
   uint8_t j;
+  uint8_t k;
   uint16_t data[2];
-  float result = -1;
+  TotalCounterTarif_t result;
 
-  _result = _node.readHoldingRegisters(RegisterTotalReactivePower, 2);
+  _result = _node.readHoldingRegisters(RegisterTotalReactivePower, 10);
 
   // do something with data if read is successful
   if (_result == _node.ku8MBSuccess)
   {
-    for (j = 0; j < 2; j++)
+    k = 0;
+    for (j = 0; j < 10; j++)
     {
-      data[j] = _node.getResponseBuffer(j);
+      data[k] = _node.getResponseBuffer(j);
+      k++;
+      switch (j)
+      {
+      case 1:
+        result.Total = getModbusFloat(data);
+        k = 0;
+        break;
+
+      case 3:
+        result.T1 = getModbusFloat(data);
+        k = 0;
+        break;
+
+      case 5:
+        result.T2 = getModbusFloat(data);
+        k = 0;
+        break;
+
+      case 7:
+        result.T3 = getModbusFloat(data);
+        k = 0;
+        break;
+
+      case 9:
+        result.T4 = getModbusFloat(data);
+        k = 0;
+        break;
+      }
     }
-    result = getModbusFloat(data);
   }
   return result;
 }
@@ -1597,102 +1710,123 @@ OR_WE_SINGLE_PHASE_TARIF::OR_WE_SINGLE_PHASE_TARIF(void)
 {
 }
 
-float OR_WE_SINGLE_PHASE_TARIF::getWeekdayTarif()
+TarifConfig_t OR_WE_SINGLE_PHASE_TARIF::getWeekdayTarif()
 {
   uint8_t j;
+  uint8_t k;
   uint16_t data[2];
-  float result = -1;
+  TarifConfig_t result;
 
-  _result = _node.readHoldingRegisters(RegisterTotalReactivePower, 2);
+  _result = _node.readHoldingRegisters(RegisterWeekdayTarif, 16);
 
   // do something with data if read is successful
   if (_result == _node.ku8MBSuccess)
   {
-    for (j = 0; j < 2; j++)
+    k = 0;
+    for (j = 0; j < 16; j++)
     {
-      data[j] = _node.getResponseBuffer(j);
+      data[k] = _node.getResponseBuffer(j);
+      k++;
+      if (k == 2)
+      {
+        result.Data[j / 2] = getModbusTarifConfig(data);
+        k = 0;
+      }
     }
-    result = getModbusFloat(data);
   }
   return result;
 }
 
-float OR_WE_SINGLE_PHASE_TARIF::getTotalWeekendTarif()
+TarifConfig_t OR_WE_SINGLE_PHASE_TARIF::getTotalWeekendTarif()
 {
   uint8_t j;
+  uint8_t k;
   uint16_t data[2];
-  float result = -1;
+  TarifConfig_t result;
 
-  _result = _node.readHoldingRegisters(RegisterTotalReactivePower, 2);
+  _result = _node.readHoldingRegisters(RegisterWeekendTarif, 16);
 
   // do something with data if read is successful
   if (_result == _node.ku8MBSuccess)
   {
-    for (j = 0; j < 2; j++)
+    k = 0;
+    for (j = 0; j < 16; j++)
     {
-      data[j] = _node.getResponseBuffer(j);
+      data[k] = _node.getResponseBuffer(j);
+      k++;
+      if (k == 2)
+      {
+        result.Data[j / 2] = getModbusTarifConfig(data);
+        k = 0;
+      }
     }
-    result = getModbusFloat(data);
   }
   return result;
 }
 
-float OR_WE_SINGLE_PHASE_TARIF::getHolidayTarif()
+TarifConfig_t OR_WE_SINGLE_PHASE_TARIF::getHolidayTarif()
 {
   uint8_t j;
+  uint8_t k;
   uint16_t data[2];
-  float result = -1;
+  TarifConfig_t result;
 
-  _result = _node.readHoldingRegisters(RegisterTotalReactivePower, 2);
+  _result = _node.readHoldingRegisters(RegisterHolidayTarif, 16);
 
   // do something with data if read is successful
   if (_result == _node.ku8MBSuccess)
   {
-    for (j = 0; j < 2; j++)
+    k = 0;
+    for (j = 0; j < 16; j++)
     {
-      data[j] = _node.getResponseBuffer(j);
+      data[k] = _node.getResponseBuffer(j);
+      k++;
+      if (k == 2)
+      {
+        result.Data[j / 2] = getModbusTarifConfig(data);
+        k = 0;
+      }
     }
-    result = getModbusFloat(data);
   }
   return result;
 }
 
-float OR_WE_SINGLE_PHASE_TARIF::getHoliday()
+HolidayConfig_t OR_WE_SINGLE_PHASE_TARIF::getHoliday()
 {
   uint8_t j;
-  uint16_t data[2];
-  float result = -1;
+  uint16_t data;
+  HolidayConfig_t result;
 
-  _result = _node.readHoldingRegisters(RegisterTotalReactivePower, 2);
+  _result = _node.readHoldingRegisters(RegisterHoliday, 100);
 
   // do something with data if read is successful
   if (_result == _node.ku8MBSuccess)
   {
-    for (j = 0; j < 2; j++)
+    for (j = 0; j < 100; j++)
     {
-      data[j] = _node.getResponseBuffer(j);
+      data = _node.getResponseBuffer(j);
+        result.Data[j] = getModbusHolidayConfig(data);
     }
-    result = getModbusFloat(data);
   }
   return result;
 }
 
-float OR_WE_SINGLE_PHASE_TARIF::getDateTime()
+tm OR_WE_SINGLE_PHASE_TARIF::getDateTime()
 {
   uint8_t j;
-  uint16_t data[2];
-  float result = -1;
+  uint16_t data[4];
+  tm result;
 
-  _result = _node.readHoldingRegisters(RegisterTotalReactivePower, 2);
+  _result = _node.readHoldingRegisters(RegisterTotalReactivePower, 4);
 
   // do something with data if read is successful
   if (_result == _node.ku8MBSuccess)
   {
-    for (j = 0; j < 2; j++)
+    for (j = 0; j < 4; j++)
     {
       data[j] = _node.getResponseBuffer(j);
     }
-    result = getModbusFloat(data);
+    result = getModbusTime(data);
   }
   return result;
 }
