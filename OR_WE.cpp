@@ -147,9 +147,9 @@ TarifConfigData_t OR_WE::getModbusTarifConfig(uint16_t data[2])
   source.data[0] = data[0];
   source.data[1] = data[1];
 
-  dest.Hour = source.b[0];
-  dest.Minute = source.b[1];
-  dest.TarifIndex = source.b[3];
+  dest.Hour = source.b[1];
+  dest.Minute = source.b[0];
+  dest.TarifIndex = source.b[2];
 
   return dest;
 }
@@ -164,8 +164,8 @@ uint16Array_t OR_WE::setModbusTarifConfig(TarifConfigData_t value)
 
   uint16Array_t dest;
 
-  source.b[0] = value.Hour;
-  source.b[1] = value.Minute;
+  source.b[1] = value.Hour;
+  source.b[0] = value.Minute;
   source.b[2] = value.TarifIndex;
 
   dest.value[0] = source.data[0];
@@ -1481,20 +1481,13 @@ OR_WE_SINGLE_PHASE::OR_WE_SINGLE_PHASE(void)
 //Voltage
 float OR_WE_SINGLE_PHASE::getVoltage()
 {
-  uint8_t j;
-  uint16_t data[2];
   float result = -1;
 
-  _result = _node.readHoldingRegisters(RegisterVoltage, 2);
-
+  _result = _node.readHoldingRegisters(RegisterVoltage, 1);
   // do something with data if read is successful
   if (_result == _node.ku8MBSuccess)
   {
-    for (j = 0; j < 2; j++)
-    {
-      data[j] = _node.getResponseBuffer(j);
-    }
-    result = getModbusFloat(data);
+    result = _node.getResponseBuffer(0) / 100.0;
   }
   return result;
 }
@@ -1502,20 +1495,14 @@ float OR_WE_SINGLE_PHASE::getVoltage()
 //Frequency
 float OR_WE_SINGLE_PHASE::getFrequency()
 {
-  uint8_t j;
-  uint16_t data[2];
   float result = -1;
 
-  _result = _node.readHoldingRegisters(RegisterFrequency, 2);
+  _result = _node.readHoldingRegisters(RegisterFrequency, 1);
 
   // do something with data if read is successful
   if (_result == _node.ku8MBSuccess)
   {
-    for (j = 0; j < 2; j++)
-    {
-      data[j] = _node.getResponseBuffer(j);
-    }
-    result = getModbusFloat(data);
+    result = _node.getResponseBuffer(0) / 100.0;
   }
   return result;
 }
@@ -1536,7 +1523,7 @@ float OR_WE_SINGLE_PHASE::getCurrent()
     {
       data[j] = _node.getResponseBuffer(j);
     }
-    result = getModbusFloat(data);
+    result = getModbusUint32(data) / 1000.0;
   }
   return result;
 }
@@ -1557,7 +1544,7 @@ float OR_WE_SINGLE_PHASE::getActivePower()
     {
       data[j] = _node.getResponseBuffer(j);
     }
-    result = getModbusFloat(data);
+    result = getModbusUint32(data) / 1000.0;
   }
   return result;
 }
@@ -1578,7 +1565,7 @@ float OR_WE_SINGLE_PHASE::getReactivePower()
     {
       data[j] = _node.getResponseBuffer(j);
     }
-    result = getModbusFloat(data);
+    result = getModbusUint32(data) / 1000.0;
   }
   return result;
 }
@@ -1599,7 +1586,7 @@ float OR_WE_SINGLE_PHASE::getApparentPower()
     {
       data[j] = _node.getResponseBuffer(j);
     }
-    result = getModbusFloat(data);
+    result = getModbusUint32(data) / 1000.0;
   }
   return result;
 }
@@ -1607,20 +1594,14 @@ float OR_WE_SINGLE_PHASE::getApparentPower()
 //Power Factor
 float OR_WE_SINGLE_PHASE::getPowerFactor()
 {
-  uint8_t j;
-  uint16_t data[2];
   float result = -1;
 
-  _result = _node.readHoldingRegisters(RegisterPowerFactor, 2);
+  _result = _node.readHoldingRegisters(RegisterPowerFactor, 1);
 
   // do something with data if read is successful
   if (_result == _node.ku8MBSuccess)
   {
-    for (j = 0; j < 2; j++)
-    {
-      data[j] = _node.getResponseBuffer(j);
-    }
-    result = getModbusFloat(data);
+    result = _node.getResponseBuffer(0) / 1000.0;
   }
   return result;
 }
@@ -1799,7 +1780,7 @@ TarifConfig_t OR_WE_SINGLE_PHASE_TARIF::getWeekdayTarif()
   return result;
 }
 
-TarifConfig_t OR_WE_SINGLE_PHASE_TARIF::getTotalWeekendTarif()
+TarifConfig_t OR_WE_SINGLE_PHASE_TARIF::getWeekendTarif()
 {
   uint8_t j;
   uint8_t k;
@@ -1910,7 +1891,7 @@ void OR_WE_SINGLE_PHASE_TARIF::setWeekdayTarif(TarifConfig_t value)
   _result = _node.writeMultipleRegisters(RegisterWeekdayTarif, 16);
 }
 
-void OR_WE_SINGLE_PHASE_TARIF::setTotalWeekendTarif(TarifConfig_t value)
+void OR_WE_SINGLE_PHASE_TARIF::setWeekendTarif(TarifConfig_t value)
 {
   uint8_t j;
   uint8_t k;

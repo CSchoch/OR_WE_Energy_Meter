@@ -38,8 +38,8 @@ struct TarifConfig_t
 //------------------------------------------------------------------------------
 struct HolidayConfigData_t
 {
+    uint8_t Day;
   uint8_t Month;
-  uint8_t Day;
 };
 
 struct HolidayConfig_t
@@ -153,13 +153,13 @@ public:
 
   //Other
   TarifConfig_t getWeekdayTarif();
-  TarifConfig_t getTotalWeekendTarif();
+  TarifConfig_t getWeekendTarif();
   TarifConfig_t getHolidayTarif();
   HolidayConfig_t getHoliday();
   tm getDateTime();
 
   void setWeekdayTarif(TarifConfig_t value);
-  void setTotalWeekendTarif(TarifConfig_t value);
+  void setWeekendTarif(TarifConfig_t value);
   void setHolidayTarif(TarifConfig_t value);
   void setHoliday(HolidayConfig_t value);
   void setDateTime(tm value);
