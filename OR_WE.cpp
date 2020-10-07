@@ -1,3 +1,6 @@
+#ifndef __OR_WE_H__
+#define __OR_WE_H__
+
 /* Library for reading Orno WE Modbus Energy meters.
 *  Reading via Hardware or Software Serial library & rs232<->rs485 converter
 */
@@ -105,6 +108,32 @@ tm OR_WE::getModbusTime(uint16_t data[4])
   return dest;
 }
 
+uint16Array_t OR_WE::setModbusTime(tm value)
+{
+  union u_data
+  {
+    byte b[8];
+    uint16_t data[4];
+  } source;
+
+  uint16Array_t dest;
+
+  source.b[0] = value.tm_mon;
+  source.b[1] = value.tm_mday;
+  source.b[2] = value.tm_year;
+  source.b[3] = value.tm_hour;
+  source.b[4] = value.tm_min;
+  source.b[5] = value.tm_sec;
+  source.b[6] = value.tm_wday;
+
+  dest.value[0] = source.data[0];
+  dest.value[1] = source.data[1];
+  dest.value[2] = source.data[2];
+  dest.value[3] = source.data[3];
+
+  return dest;
+}
+
 TarifConfigData_t OR_WE::getModbusTarifConfig(uint16_t data[2])
 {
   union u_data
@@ -125,6 +154,26 @@ TarifConfigData_t OR_WE::getModbusTarifConfig(uint16_t data[2])
   return dest;
 }
 
+uint16Array_t OR_WE::setModbusTarifConfig(TarifConfigData_t value)
+{
+  union u_data
+  {
+    byte b[4];
+    uint16_t data[2];
+  } source;
+
+  uint16Array_t dest;
+
+  source.b[0] = value.Hour;
+  source.b[1] = value.Minute;
+  source.b[2] = value.TarifIndex;
+
+  dest.value[0] = source.data[0];
+  dest.value[1] = source.data[1];
+
+  return dest;
+}
+
 HolidayConfigData_t OR_WE::getModbusHolidayConfig(uint16_t data)
 {
   union u_data
@@ -136,6 +185,19 @@ HolidayConfigData_t OR_WE::getModbusHolidayConfig(uint16_t data)
   source.data = data;
 
   return source.val;
+}
+
+uint16_t OR_WE::setModbusHolidayConfig(HolidayConfigData_t value)
+{
+  union u_data
+  {
+    HolidayConfigData_t val;
+    uint16_t data;
+  } source;
+
+  source.val = value;
+
+  return source.data;
 }
 
 //------------------------------------------------------------------------------
@@ -1805,7 +1867,7 @@ HolidayConfig_t OR_WE_SINGLE_PHASE_TARIF::getHoliday()
     for (j = 0; j < 100; j++)
     {
       data = _node.getResponseBuffer(j);
-        result.Data[j] = getModbusHolidayConfig(data);
+      result.Data[j] = getModbusHolidayConfig(data);
     }
   }
   return result;
@@ -1830,3 +1892,81 @@ tm OR_WE_SINGLE_PHASE_TARIF::getDateTime()
   }
   return result;
 }
+
+void OR_WE_SINGLE_PHASE_TARIF::setWeekdayTarif(TarifConfig_t value)
+{
+  uint8_t j;
+  uint8_t k;
+  uint16Array_t data;
+
+  for (j = 0; j < 8; j++)
+  {
+    data = setModbusTarifConfig(value.Data[j]);
+    for (k = 0; k < 2; k++)
+    {
+      _node.setTransmitBuffer(j * 2 + k, data.value[k]);
+    }
+  }
+  _result = _node.writeMultipleRegisters(RegisterWeekdayTarif, 16);
+}
+
+void OR_WE_SINGLE_PHASE_TARIF::setTotalWeekendTarif(TarifConfig_t value)
+{
+  uint8_t j;
+  uint8_t k;
+  uint16Array_t data;
+
+  for (j = 0; j < 8; j++)
+  {
+    data = setModbusTarifConfig(value.Data[j]);
+    for (k = 0; k < 2; k++)
+    {
+      _node.setTransmitBuffer(j * 2 + k, data.value[k]);
+    }
+  }
+  _result = _node.writeMultipleRegisters(RegisterWeekendTarif, 16);
+}
+
+void OR_WE_SINGLE_PHASE_TARIF::setHolidayTarif(TarifConfig_t value)
+{
+  uint8_t j;
+  uint8_t k;
+  uint16Array_t data;
+
+  for (j = 0; j < 8; j++)
+  {
+    data = setModbusTarifConfig(value.Data[j]);
+    for (k = 0; k < 2; k++)
+    {
+      _node.setTransmitBuffer(j * 2 + k, data.value[k]);
+    }
+  }
+  _result = _node.writeMultipleRegisters(RegisterHolidayTarif, 16);
+}
+
+void OR_WE_SINGLE_PHASE_TARIF::setHoliday(HolidayConfig_t value)
+{
+  uint8_t j;
+
+  for (j = 0; j < 100; j++)
+  {
+    _node.setTransmitBuffer(j, setModbusHolidayConfig(value.Data[j]));
+  }
+  _result = _node.writeMultipleRegisters(RegisterHoliday, 100);
+}
+
+void OR_WE_SINGLE_PHASE_TARIF::setDateTime(tm value)
+{
+  uint8_t j;
+  uint8_t k;
+  uint16Array_t data;
+
+  data = setModbusTime(value);
+  for (j = 0; j < 4; j++)
+  {
+    _node.setTransmitBuffer(j, data.value[k]);
+  }
+  _result = _node.writeMultipleRegisters(RegisterHolidayTarif, 4);
+}
+
+#endif // __OR_WE_H__

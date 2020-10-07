@@ -15,36 +15,41 @@
 //------------------------------------------------------------------------------
 struct TotalCounterTarif_t
 {
-  float	Total;
-  float	T1;
-  float	T2;
-  float	T3;
-  float	T4;
+  float Total;
+  float T1;
+  float T2;
+  float T3;
+  float T4;
 };
 
 //------------------------------------------------------------------------------
 struct TarifConfigData_t
 {
-  uint8_t	Hour;
-  uint8_t	Minute;
-  uint8_t	TarifIndex;
+  uint8_t Hour;
+  uint8_t Minute;
+  uint8_t TarifIndex;
 };
 
 struct TarifConfig_t
 {
-  TarifConfigData_t	Data[8];
+  TarifConfigData_t Data[8];
 };
 
 //------------------------------------------------------------------------------
 struct HolidayConfigData_t
 {
-  uint8_t	Month;
-  uint8_t	Day;
+  uint8_t Month;
+  uint8_t Day;
 };
 
 struct HolidayConfig_t
 {
-  HolidayConfigData_t	Data[100];
+  HolidayConfigData_t Data[100];
+};
+
+struct uint16Array_t
+{
+  uint16_t value[4];
 };
 
 //------------------------------------------------------------------------------
@@ -66,8 +71,11 @@ protected:
   float getModbusFloat(uint16_t data[2]);
   uint32_t getModbusUint32(uint16_t data[2]);
   tm getModbusTime(uint16_t data[4]);
+  uint16Array_t setModbusTime(tm vale);
   TarifConfigData_t getModbusTarifConfig(uint16_t data[2]);
+  uint16Array_t setModbusTarifConfig(TarifConfigData_t value);
   HolidayConfigData_t getModbusHolidayConfig(uint16_t data);
+  uint16_t setModbusHolidayConfig(HolidayConfigData_t value);
 };
 
 class OR_WE_SINGLE_PHASE : public OR_WE
@@ -149,6 +157,12 @@ public:
   TarifConfig_t getHolidayTarif();
   HolidayConfig_t getHoliday();
   tm getDateTime();
+
+  void setWeekdayTarif(TarifConfig_t value);
+  void setTotalWeekendTarif(TarifConfig_t value);
+  void setHolidayTarif(TarifConfig_t value);
+  void setHoliday(HolidayConfig_t value);
+  void setDateTime(tm value);
 
 protected:
   //OR_WE registers
