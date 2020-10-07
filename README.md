@@ -2,7 +2,7 @@
 
 ### SECTIONS: ###
 #### 1. [INTRODUCTION](#introduction) ####
-
+#### 2. [ModbusMaster](#modbusmaster) ####
 ---
 
 ### Introduction: ###
@@ -16,3 +16,5 @@ you also need rs232<->rs485 converter:
 
 ---
 
+### modbusmaster: ###
+You need to change the value "ku8MaxBufferSize" inside the library to 100!

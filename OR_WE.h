@@ -38,13 +38,19 @@ struct TarifConfig_t
 //------------------------------------------------------------------------------
 struct HolidayConfigData_t
 {
-  uint8_t Month;
   uint8_t Day;
+  uint8_t Month;
 };
 
 struct HolidayConfig_t
 {
   HolidayConfigData_t Data[100];
+};
+
+struct BaudConfig_t
+{
+  uint16_t Baud;
+  uint8_t Parity; // 1 = NONE, 2 = ODD, 3 = EVEN
 };
 
 struct uint16Array_t
@@ -76,6 +82,8 @@ protected:
   uint16Array_t setModbusTarifConfig(TarifConfigData_t value);
   HolidayConfigData_t getModbusHolidayConfig(uint16_t data);
   uint16_t setModbusHolidayConfig(HolidayConfigData_t value);
+  BaudConfig_t getModbusBaud(uint16_t data);
+  uint16_t setModbusBaud(BaudConfig_t value);
 };
 
 class OR_WE_SINGLE_PHASE : public OR_WE
@@ -110,8 +118,9 @@ public:
 
   //Other
   uint16_t getMeterId();
-  uint16_t getBusBaud();
-  uint16_t getLcdState();
+  BaudConfig_t getBusBaud();
+  void setBusBaud(BaudConfig_t value);
+  //uint16_t getLcdState(); // not supported yet
 
 protected:
   //OR_WE registers
@@ -153,13 +162,13 @@ public:
 
   //Other
   TarifConfig_t getWeekdayTarif();
-  TarifConfig_t getTotalWeekendTarif();
+  TarifConfig_t getWeekendTarif();
   TarifConfig_t getHolidayTarif();
   HolidayConfig_t getHoliday();
   tm getDateTime();
 
   void setWeekdayTarif(TarifConfig_t value);
-  void setTotalWeekendTarif(TarifConfig_t value);
+  void setWeekendTarif(TarifConfig_t value);
   void setHolidayTarif(TarifConfig_t value);
   void setHoliday(HolidayConfig_t value);
   void setDateTime(tm value);
@@ -252,7 +261,8 @@ public:
   //Other
   uint32_t getSerialNo();
   uint16_t getMeterId();
-  uint16_t getBusBaud();
+  BaudConfig_t getBusBaud();
+  void setBusBaud(BaudConfig_t value);
   float getSoftwareVersion();
   float getHardwareVersion();
   uint16_t getCountRate();
