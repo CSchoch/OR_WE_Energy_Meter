@@ -9,7 +9,7 @@
 #include <HardwareSerial.h>
 #include <OR_WE.h>
 
-OR_WE_SINGLE_PHASE_TARIF EnergyMeter;
+OR_WE_SINGLE_PHASE_TARIFF EnergyMeter;
 
 void setup()
 {
@@ -26,8 +26,8 @@ void loop()
 {
 
   float value;
-  TotalCounterTarif_t counterValue;
-  TarifConfig_t tarifConfigValue;
+  TotalCounterTariff_t counterValue;
+  TariffConfig_t tarifConfigValue;
   HolidayConfig_t holidayConfigValue;
   tm dateTimeValue;
 
@@ -112,25 +112,25 @@ void loop()
   Serial.print(EnergyMeter.getBusBaud().Baud);
   Serial.print(" ");
   Serial.println(EnergyMeter.getBusBaud().Parity);
-  tarifConfigValue = EnergyMeter.getWeekdayTarif();
-  Serial.print("getWeekdayTarif: ");
+  tarifConfigValue = EnergyMeter.getWeekdayTariff();
+  Serial.print("getWeekdayTariff: ");
   for (int16_t i = 0; i < 8; i++)
   {
     Serial.print(tarifConfigValue.Data[i].Hour);
     Serial.print(":");
     Serial.print(tarifConfigValue.Data[i].Minute);
     Serial.print(" T");
-    Serial.print(tarifConfigValue.Data[i].TarifIndex);
+    Serial.print(tarifConfigValue.Data[i].TariffIndex);
     Serial.print(" ");
   }
   Serial.println("");
 
   // tarifConfigValue.Data[0].Hour++;
   // tarifConfigValue.Data[0].Hour %= 24;
-  // EnergyMeter.setWeekdayTarif(tarifConfigValue);
+  // EnergyMeter.setWeekdayTariff(tarifConfigValue);
   // Serial.println(EnergyMeter.getErrCode());
 
-  tarifConfigValue = EnergyMeter.getWeekendTarif();
+  tarifConfigValue = EnergyMeter.getWeekendTariff();
   Serial.print("getWeekendTarif: ");
   for (int16_t i = 0; i < 8; i++)
   {
@@ -138,32 +138,32 @@ void loop()
     Serial.print(":");
     Serial.print(tarifConfigValue.Data[i].Minute);
     Serial.print(" T");
-    Serial.print(tarifConfigValue.Data[i].TarifIndex);
+    Serial.print(tarifConfigValue.Data[i].TariffIndex);
     Serial.print(" ");
   }
   Serial.println("");
 
   // tarifConfigValue.Data[0].Hour++;
   // tarifConfigValue.Data[0].Hour %= 24;
-  // EnergyMeter.setWeekendTarif(tarifConfigValue);
+  // EnergyMeter.setWeekendTariff(tarifConfigValue);
   // Serial.println(EnergyMeter.getErrCode());
 
-  tarifConfigValue = EnergyMeter.getHolidayTarif();
-  Serial.print("getHolidayTarif: ");
+  tarifConfigValue = EnergyMeter.getHolidayTariff();
+  Serial.print("getHolidayTariff: ");
   for (int16_t i = 0; i < 8; i++)
   {
     Serial.print(tarifConfigValue.Data[i].Hour);
     Serial.print(":");
     Serial.print(tarifConfigValue.Data[i].Minute);
     Serial.print(" T");
-    Serial.print(tarifConfigValue.Data[i].TarifIndex);
+    Serial.print(tarifConfigValue.Data[i].TariffIndex);
     Serial.print(" ");
   }
   Serial.println("");
 
   // tarifConfigValue.Data[0].Hour++;
   // tarifConfigValue.Data[0].Hour %= 24;
-  // EnergyMeter.setHolidayTarif(tarifConfigValue);
+  // EnergyMeter.setHolidayTariff(tarifConfigValue);
   // Serial.println(EnergyMeter.getErrCode());
 
   holidayConfigValue = EnergyMeter.getHoliday();

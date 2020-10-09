@@ -134,7 +134,7 @@ uint16Array_t OR_WE::setModbusTime(tm value)
   return dest;
 }
 
-TarifConfigData_t OR_WE::getModbusTarifConfig(uint16_t data[2])
+TariffConfigData_t OR_WE::getModbusTariffConfig(uint16_t data[2])
 {
   union u_data
   {
@@ -142,19 +142,19 @@ TarifConfigData_t OR_WE::getModbusTarifConfig(uint16_t data[2])
     uint16_t data[2];
   } source;
 
-  TarifConfigData_t dest;
+  TariffConfigData_t dest;
 
   source.data[0] = data[0];
   source.data[1] = data[1];
 
   dest.Hour = source.b[1];
   dest.Minute = source.b[0];
-  dest.TarifIndex = source.b[2];
+  dest.TariffIndex = source.b[2];
 
   return dest;
 }
 
-uint16Array_t OR_WE::setModbusTarifConfig(TarifConfigData_t value)
+uint16Array_t OR_WE::setModbusTariffConfig(TariffConfigData_t value)
 {
   union u_data
   {
@@ -166,7 +166,7 @@ uint16Array_t OR_WE::setModbusTarifConfig(TarifConfigData_t value)
 
   source.b[1] = value.Hour;
   source.b[0] = value.Minute;
-  source.b[2] = value.TarifIndex;
+  source.b[2] = value.TariffIndex;
 
   dest.value[0] = source.data[0];
   dest.value[1] = source.data[1];
@@ -799,6 +799,7 @@ float OR_WE_THREE_PHASE::getTotalCounterActivePowerL2()
   }
   return result;
 }
+
 float OR_WE_THREE_PHASE::getTotalCounterActivePowerL3()
 {
   uint8_t j;
@@ -806,6 +807,86 @@ float OR_WE_THREE_PHASE::getTotalCounterActivePowerL3()
   float result = -1;
 
   _result = _node.readHoldingRegisters(RegisterTotalActivePowerP3, 2);
+
+  // do something with data if read is successful
+  if (_result == _node.ku8MBSuccess)
+  {
+    for (j = 0; j < 2; j++)
+    {
+      data[j] = _node.getResponseBuffer(j);
+    }
+    result = getModbusFloat(data);
+  }
+  return result;
+}
+
+float OR_WE_THREE_PHASE::getTotalCounterActivePowerT1()
+{
+  uint8_t j;
+  uint16_t data[2];
+  float result = -1;
+
+  _result = _node.readHoldingRegisters(RegisterTotalActivePowerSystemT1, 2);
+
+  // do something with data if read is successful
+  if (_result == _node.ku8MBSuccess)
+  {
+    for (j = 0; j < 2; j++)
+    {
+      data[j] = _node.getResponseBuffer(j);
+    }
+    result = getModbusFloat(data);
+  }
+  return result;
+}
+
+float OR_WE_THREE_PHASE::getTotalCounterActivePowerT2()
+{
+  uint8_t j;
+  uint16_t data[2];
+  float result = -1;
+
+  _result = _node.readHoldingRegisters(RegisterTotalActivePowerSystemT2, 2);
+
+  // do something with data if read is successful
+  if (_result == _node.ku8MBSuccess)
+  {
+    for (j = 0; j < 2; j++)
+    {
+      data[j] = _node.getResponseBuffer(j);
+    }
+    result = getModbusFloat(data);
+  }
+  return result;
+}
+
+float OR_WE_THREE_PHASE::getTotalCounterActivePowerT3()
+{
+  uint8_t j;
+  uint16_t data[2];
+  float result = -1;
+
+  _result = _node.readHoldingRegisters(RegisterTotalActivePowerSystemT3, 2);
+
+  // do something with data if read is successful
+  if (_result == _node.ku8MBSuccess)
+  {
+    for (j = 0; j < 2; j++)
+    {
+      data[j] = _node.getResponseBuffer(j);
+    }
+    result = getModbusFloat(data);
+  }
+  return result;
+}
+
+float OR_WE_THREE_PHASE::getTotalCounterActivePowerT4()
+{
+  uint8_t j;
+  uint16_t data[2];
+  float result = -1;
+
+  _result = _node.readHoldingRegisters(RegisterTotalActivePowerSystemT4, 2);
 
   // do something with data if read is successful
   if (_result == _node.ku8MBSuccess)
@@ -876,6 +957,7 @@ float OR_WE_THREE_PHASE::getTotalCounterReactivePowerL2()
   }
   return result;
 }
+
 float OR_WE_THREE_PHASE::getTotalCounterReactivePowerL3()
 {
   uint8_t j;
@@ -883,6 +965,86 @@ float OR_WE_THREE_PHASE::getTotalCounterReactivePowerL3()
   float result = -1;
 
   _result = _node.readHoldingRegisters(RegisterTotalReactivePowerP3, 2);
+
+  // do something with data if read is successful
+  if (_result == _node.ku8MBSuccess)
+  {
+    for (j = 0; j < 2; j++)
+    {
+      data[j] = _node.getResponseBuffer(j);
+    }
+    result = getModbusFloat(data);
+  }
+  return result;
+}
+
+float OR_WE_THREE_PHASE::getTotalCounterReactivePowerT1()
+{
+  uint8_t j;
+  uint16_t data[2];
+  float result = -1;
+
+  _result = _node.readHoldingRegisters(RegisterTotalReactivePowerSystemT1, 2);
+
+  // do something with data if read is successful
+  if (_result == _node.ku8MBSuccess)
+  {
+    for (j = 0; j < 2; j++)
+    {
+      data[j] = _node.getResponseBuffer(j);
+    }
+    result = getModbusFloat(data);
+  }
+  return result;
+}
+
+float OR_WE_THREE_PHASE::getTotalCounterReactivePowerT2()
+{
+  uint8_t j;
+  uint16_t data[2];
+  float result = -1;
+
+  _result = _node.readHoldingRegisters(RegisterTotalReactivePowerSystemT2, 2);
+
+  // do something with data if read is successful
+  if (_result == _node.ku8MBSuccess)
+  {
+    for (j = 0; j < 2; j++)
+    {
+      data[j] = _node.getResponseBuffer(j);
+    }
+    result = getModbusFloat(data);
+  }
+  return result;
+}
+
+float OR_WE_THREE_PHASE::getTotalCounterReactivePowerT3()
+{
+  uint8_t j;
+  uint16_t data[2];
+  float result = -1;
+
+  _result = _node.readHoldingRegisters(RegisterTotalReactivePowerSystemT3, 2);
+
+  // do something with data if read is successful
+  if (_result == _node.ku8MBSuccess)
+  {
+    for (j = 0; j < 2; j++)
+    {
+      data[j] = _node.getResponseBuffer(j);
+    }
+    result = getModbusFloat(data);
+  }
+  return result;
+}
+
+float OR_WE_THREE_PHASE::getTotalCounterReactivePowerT4()
+{
+  uint8_t j;
+  uint16_t data[2];
+  float result = -1;
+
+  _result = _node.readHoldingRegisters(RegisterTotalReactivePowerSystemT4, 2);
 
   // do something with data if read is successful
   if (_result == _node.ku8MBSuccess)
@@ -954,6 +1116,7 @@ float OR_WE_THREE_PHASE::getImportCounterActivePowerL2()
   }
   return result;
 }
+
 float OR_WE_THREE_PHASE::getImportCounterActivePowerL3()
 {
   uint8_t j;
@@ -961,6 +1124,86 @@ float OR_WE_THREE_PHASE::getImportCounterActivePowerL3()
   float result = -1;
 
   _result = _node.readHoldingRegisters(RegisterImportActivePowerP3, 2);
+
+  // do something with data if read is successful
+  if (_result == _node.ku8MBSuccess)
+  {
+    for (j = 0; j < 2; j++)
+    {
+      data[j] = _node.getResponseBuffer(j);
+    }
+    result = getModbusFloat(data);
+  }
+  return result;
+}
+
+float OR_WE_THREE_PHASE::getImportCounterActivePowerT1()
+{
+  uint8_t j;
+  uint16_t data[2];
+  float result = -1;
+
+  _result = _node.readHoldingRegisters(RegisterImportActivePowerSystemT1, 2);
+
+  // do something with data if read is successful
+  if (_result == _node.ku8MBSuccess)
+  {
+    for (j = 0; j < 2; j++)
+    {
+      data[j] = _node.getResponseBuffer(j);
+    }
+    result = getModbusFloat(data);
+  }
+  return result;
+}
+
+float OR_WE_THREE_PHASE::getImportCounterActivePowerT2()
+{
+  uint8_t j;
+  uint16_t data[2];
+  float result = -1;
+
+  _result = _node.readHoldingRegisters(RegisterImportActivePowerSystemT2, 2);
+
+  // do something with data if read is successful
+  if (_result == _node.ku8MBSuccess)
+  {
+    for (j = 0; j < 2; j++)
+    {
+      data[j] = _node.getResponseBuffer(j);
+    }
+    result = getModbusFloat(data);
+  }
+  return result;
+}
+
+float OR_WE_THREE_PHASE::getImportCounterActivePowerT3()
+{
+  uint8_t j;
+  uint16_t data[2];
+  float result = -1;
+
+  _result = _node.readHoldingRegisters(RegisterImportActivePowerSystemT3, 2);
+
+  // do something with data if read is successful
+  if (_result == _node.ku8MBSuccess)
+  {
+    for (j = 0; j < 2; j++)
+    {
+      data[j] = _node.getResponseBuffer(j);
+    }
+    result = getModbusFloat(data);
+  }
+  return result;
+}
+
+float OR_WE_THREE_PHASE::getImportCounterActivePowerT4()
+{
+  uint8_t j;
+  uint16_t data[2];
+  float result = -1;
+
+  _result = _node.readHoldingRegisters(RegisterImportActivePowerSystemT4, 2);
 
   // do something with data if read is successful
   if (_result == _node.ku8MBSuccess)
@@ -1031,6 +1274,7 @@ float OR_WE_THREE_PHASE::getImportCounterReactivePowerL2()
   }
   return result;
 }
+
 float OR_WE_THREE_PHASE::getImportCounterReactivePowerL3()
 {
   uint8_t j;
@@ -1038,6 +1282,86 @@ float OR_WE_THREE_PHASE::getImportCounterReactivePowerL3()
   float result = -1;
 
   _result = _node.readHoldingRegisters(RegisterImportReactiveP3, 2);
+
+  // do something with data if read is successful
+  if (_result == _node.ku8MBSuccess)
+  {
+    for (j = 0; j < 2; j++)
+    {
+      data[j] = _node.getResponseBuffer(j);
+    }
+    result = getModbusFloat(data);
+  }
+  return result;
+}
+
+float OR_WE_THREE_PHASE::getImportCounterReactivePowerT1()
+{
+  uint8_t j;
+  uint16_t data[2];
+  float result = -1;
+
+  _result = _node.readHoldingRegisters(RegisterImportReactiveSystemT1, 2);
+
+  // do something with data if read is successful
+  if (_result == _node.ku8MBSuccess)
+  {
+    for (j = 0; j < 2; j++)
+    {
+      data[j] = _node.getResponseBuffer(j);
+    }
+    result = getModbusFloat(data);
+  }
+  return result;
+}
+
+float OR_WE_THREE_PHASE::getImportCounterReactivePowerT2()
+{
+  uint8_t j;
+  uint16_t data[2];
+  float result = -1;
+
+  _result = _node.readHoldingRegisters(RegisterImportReactiveSystemT2, 2);
+
+  // do something with data if read is successful
+  if (_result == _node.ku8MBSuccess)
+  {
+    for (j = 0; j < 2; j++)
+    {
+      data[j] = _node.getResponseBuffer(j);
+    }
+    result = getModbusFloat(data);
+  }
+  return result;
+}
+
+float OR_WE_THREE_PHASE::getImportCounterReactivePowerT3()
+{
+  uint8_t j;
+  uint16_t data[2];
+  float result = -1;
+
+  _result = _node.readHoldingRegisters(RegisterImportReactiveSystemT3, 2);
+
+  // do something with data if read is successful
+  if (_result == _node.ku8MBSuccess)
+  {
+    for (j = 0; j < 2; j++)
+    {
+      data[j] = _node.getResponseBuffer(j);
+    }
+    result = getModbusFloat(data);
+  }
+  return result;
+}
+
+float OR_WE_THREE_PHASE::getImportCounterReactivePowerT4()
+{
+  uint8_t j;
+  uint16_t data[2];
+  float result = -1;
+
+  _result = _node.readHoldingRegisters(RegisterImportReactiveSystemT4, 2);
 
   // do something with data if read is successful
   if (_result == _node.ku8MBSuccess)
@@ -1130,6 +1454,86 @@ float OR_WE_THREE_PHASE::getExportCounterActivePowerL3()
   return result;
 }
 
+float OR_WE_THREE_PHASE::getExportCounterActivePowerT1()
+{
+  uint8_t j;
+  uint16_t data[2];
+  float result = -1;
+
+  _result = _node.readHoldingRegisters(RegisterExportActivePowerSystemT1, 2);
+
+  // do something with data if read is successful
+  if (_result == _node.ku8MBSuccess)
+  {
+    for (j = 0; j < 2; j++)
+    {
+      data[j] = _node.getResponseBuffer(j);
+    }
+    result = getModbusFloat(data);
+  }
+  return result;
+}
+
+float OR_WE_THREE_PHASE::getExportCounterActivePowerT2()
+{
+  uint8_t j;
+  uint16_t data[2];
+  float result = -1;
+
+  _result = _node.readHoldingRegisters(RegisterExportActivePowerSystemT2, 2);
+
+  // do something with data if read is successful
+  if (_result == _node.ku8MBSuccess)
+  {
+    for (j = 0; j < 2; j++)
+    {
+      data[j] = _node.getResponseBuffer(j);
+    }
+    result = getModbusFloat(data);
+  }
+  return result;
+}
+
+float OR_WE_THREE_PHASE::getExportCounterActivePowerT3()
+{
+  uint8_t j;
+  uint16_t data[2];
+  float result = -1;
+
+  _result = _node.readHoldingRegisters(RegisterExportActivePowerSystemT3, 2);
+
+  // do something with data if read is successful
+  if (_result == _node.ku8MBSuccess)
+  {
+    for (j = 0; j < 2; j++)
+    {
+      data[j] = _node.getResponseBuffer(j);
+    }
+    result = getModbusFloat(data);
+  }
+  return result;
+}
+
+float OR_WE_THREE_PHASE::getExportCounterActivePowerT4()
+{
+  uint8_t j;
+  uint16_t data[2];
+  float result = -1;
+
+  _result = _node.readHoldingRegisters(RegisterExportActivePowerSystemT4, 2);
+
+  // do something with data if read is successful
+  if (_result == _node.ku8MBSuccess)
+  {
+    for (j = 0; j < 2; j++)
+    {
+      data[j] = _node.getResponseBuffer(j);
+    }
+    result = getModbusFloat(data);
+  }
+  return result;
+}
+
 float OR_WE_THREE_PHASE::getExportCounterReactivePowerTotal()
 {
   uint8_t j;
@@ -1208,6 +1612,86 @@ float OR_WE_THREE_PHASE::getExportCounterReactivePowerL3()
   return result;
 }
 
+float OR_WE_THREE_PHASE::getExportCounterReactivePowerT1()
+{
+  uint8_t j;
+  uint16_t data[2];
+  float result = -1;
+
+  _result = _node.readHoldingRegisters(RegisterExportReactivePowerSystemT1, 2);
+
+  // do something with data if read is successful
+  if (_result == _node.ku8MBSuccess)
+  {
+    for (j = 0; j < 2; j++)
+    {
+      data[j] = _node.getResponseBuffer(j);
+    }
+    result = getModbusFloat(data);
+  }
+  return result;
+}
+
+float OR_WE_THREE_PHASE::getExportCounterReactivePowerT2()
+{
+  uint8_t j;
+  uint16_t data[2];
+  float result = -1;
+
+  _result = _node.readHoldingRegisters(RegisterExportReactivePowerSystemT2, 2);
+
+  // do something with data if read is successful
+  if (_result == _node.ku8MBSuccess)
+  {
+    for (j = 0; j < 2; j++)
+    {
+      data[j] = _node.getResponseBuffer(j);
+    }
+    result = getModbusFloat(data);
+  }
+  return result;
+}
+
+float OR_WE_THREE_PHASE::getExportCounterReactivePowerT3()
+{
+  uint8_t j;
+  uint16_t data[2];
+  float result = -1;
+
+  _result = _node.readHoldingRegisters(RegisterExportReactivePowerSystemT3, 2);
+
+  // do something with data if read is successful
+  if (_result == _node.ku8MBSuccess)
+  {
+    for (j = 0; j < 2; j++)
+    {
+      data[j] = _node.getResponseBuffer(j);
+    }
+    result = getModbusFloat(data);
+  }
+  return result;
+}
+
+float OR_WE_THREE_PHASE::getExportCounterReactivePowerT4()
+{
+  uint8_t j;
+  uint16_t data[2];
+  float result = -1;
+
+  _result = _node.readHoldingRegisters(RegisterExportReactivePowerSystemT4, 2);
+
+  // do something with data if read is successful
+  if (_result == _node.ku8MBSuccess)
+  {
+    for (j = 0; j < 2; j++)
+    {
+      data[j] = _node.getResponseBuffer(j);
+    }
+    result = getModbusFloat(data);
+  }
+  return result;
+}
+
 //Other
 uint32_t OR_WE_THREE_PHASE::getSerialNo()
 {
@@ -1262,6 +1746,26 @@ void OR_WE_THREE_PHASE::setBusBaud(BaudConfig_t value)
   _node.setTransmitBuffer(0, setModbusBaud(value));
 
   _result = _node.writeMultipleRegisters(RegisterBusBaud, 1);
+}
+
+void OR_WE_THREE_PHASE::setS0Rate(float value) 
+{
+  
+}
+
+void OR_WE_THREE_PHASE::setCombinedCode(uint16_t value) 
+{
+  
+}
+
+void OR_WE_THREE_PHASE::setLcdCycleTime(uint16_t value) 
+{
+  
+}
+
+void OR_WE_THREE_PHASE::setDateTime(tm value) 
+{
+  
 }
 
 float OR_WE_THREE_PHASE::getSoftwareVersion()
@@ -1394,166 +1898,105 @@ uint16_t OR_WE_THREE_PHASE::getCombinedCode()
   return result;
 }
 
+uint16_t OR_WE_THREE_PHASE::getLcdCycleTime() 
+{
+  
+}
+
+tm OR_WE_THREE_PHASE::getDateTime() 
+{
+  
+}
+
+void OR_WE_THREE_PHASE::setMeterId(uint16_t value) 
+{
+  
+}
+
 //------------------------------------------------------------------------------
-OR_WE_THREE_PHASE_TARIF::OR_WE_THREE_PHASE_TARIF(void)
+OR_WE_THREE_PHASE_TARIFF::OR_WE_THREE_PHASE_TARIFF()
 {
 }
 
-//Counter Export
-float OR_WE_THREE_PHASE_TARIF::getExportCounterActivePowerTotal()
+HolidayConfig_t OR_WE_THREE_PHASE_TARIFF::getHolidayWeekendTariff()
 {
-  uint8_t j;
-  uint16_t data[2];
-  float result = -1;
-
-  _result = _node.readHoldingRegisters(RegisterExportActivePowerSystem, 2);
-
-  // do something with data if read is successful
-  if (_result == _node.ku8MBSuccess)
-  {
-    for (j = 0; j < 2; j++)
-    {
-      data[j] = _node.getResponseBuffer(j);
-    }
-    result = getModbusFloat(data);
-  }
-  return result;
-}
-float OR_WE_THREE_PHASE_TARIF::getExportCounterActivePowerL1()
-{
-  uint8_t j;
-  uint16_t data[2];
-  float result = -1;
-
-  _result = _node.readHoldingRegisters(RegisterExportActivePowerP1, 2);
-
-  // do something with data if read is successful
-  if (_result == _node.ku8MBSuccess)
-  {
-    for (j = 0; j < 2; j++)
-    {
-      data[j] = _node.getResponseBuffer(j);
-    }
-    result = getModbusFloat(data);
-  }
-  return result;
-}
-float OR_WE_THREE_PHASE_TARIF::getExportCounterActivePowerL2()
-{
-  uint8_t j;
-  uint16_t data[2];
-  float result = -1;
-
-  _result = _node.readHoldingRegisters(RegisterExportActivePowerP2, 2);
-
-  // do something with data if read is successful
-  if (_result == _node.ku8MBSuccess)
-  {
-    for (j = 0; j < 2; j++)
-    {
-      data[j] = _node.getResponseBuffer(j);
-    }
-    result = getModbusFloat(data);
-  }
-  return result;
 }
 
-float OR_WE_THREE_PHASE_TARIF::getExportCounterActivePowerL3()
+TariffConfig_t OR_WE_THREE_PHASE_TARIFF::getTimeInterval1()
 {
-  uint8_t j;
-  uint16_t data[2];
-  float result = -1;
-
-  _result = _node.readHoldingRegisters(RegisterExportActivePowerP3, 2);
-
-  // do something with data if read is successful
-  if (_result == _node.ku8MBSuccess)
-  {
-    for (j = 0; j < 2; j++)
-    {
-      data[j] = _node.getResponseBuffer(j);
-    }
-    result = getModbusFloat(data);
-  }
-  return result;
 }
 
-float OR_WE_THREE_PHASE_TARIF::getExportCounterReactivePowerTotal()
+TariffConfig_t OR_WE_THREE_PHASE_TARIFF::getTimeInterval2()
 {
-  uint8_t j;
-  uint16_t data[2];
-  float result = -1;
-
-  _result = _node.readHoldingRegisters(RegisterExportReactivePowerSystem, 2);
-
-  // do something with data if read is successful
-  if (_result == _node.ku8MBSuccess)
-  {
-    for (j = 0; j < 2; j++)
-    {
-      data[j] = _node.getResponseBuffer(j);
-    }
-    result = getModbusFloat(data);
-  }
-  return result;
-}
-float OR_WE_THREE_PHASE_TARIF::getExportCounterReactivePowerL1()
-{
-  uint8_t j;
-  uint16_t data[2];
-  float result = -1;
-
-  _result = _node.readHoldingRegisters(RegisterExportReactivePowerP1, 2);
-
-  // do something with data if read is successful
-  if (_result == _node.ku8MBSuccess)
-  {
-    for (j = 0; j < 2; j++)
-    {
-      data[j] = _node.getResponseBuffer(j);
-    }
-    result = getModbusFloat(data);
-  }
-  return result;
-}
-float OR_WE_THREE_PHASE_TARIF::getExportCounterReactivePowerL2()
-{
-  uint8_t j;
-  uint16_t data[2];
-  float result = -1;
-
-  _result = _node.readHoldingRegisters(RegisterExportReactivePowerP2, 2);
-
-  // do something with data if read is successful
-  if (_result == _node.ku8MBSuccess)
-  {
-    for (j = 0; j < 2; j++)
-    {
-      data[j] = _node.getResponseBuffer(j);
-    }
-    result = getModbusFloat(data);
-  }
-  return result;
 }
 
-float OR_WE_THREE_PHASE_TARIF::getExportCounterReactivePowerL3()
+TariffConfig_t OR_WE_THREE_PHASE_TARIFF::getTimeInterval3()
 {
-  uint8_t j;
-  uint16_t data[2];
-  float result = -1;
+}
 
-  _result = _node.readHoldingRegisters(RegisterExportReactivePowerP3, 2);
+TariffConfig_t OR_WE_THREE_PHASE_TARIFF::getTimeInterval4()
+{
+}
 
-  // do something with data if read is successful
-  if (_result == _node.ku8MBSuccess)
-  {
-    for (j = 0; j < 2; j++)
-    {
-      data[j] = _node.getResponseBuffer(j);
-    }
-    result = getModbusFloat(data);
-  }
-  return result;
+TariffConfig_t OR_WE_THREE_PHASE_TARIFF::getTimeInterval5()
+{
+}
+
+TariffConfig_t OR_WE_THREE_PHASE_TARIFF::getTimeInterval6()
+{
+}
+
+TariffConfig_t OR_WE_THREE_PHASE_TARIFF::getTimeInterval7()
+{
+}
+
+TariffConfig_t OR_WE_THREE_PHASE_TARIFF::getTimeInterval8()
+{
+}
+
+TariffConfig_t OR_WE_THREE_PHASE_TARIFF::getTimeZone()
+{
+}
+
+void OR_WE_THREE_PHASE_TARIFF::setHolidayWeekendTariff(HolidayConfig_t value)
+{
+}
+
+void OR_WE_THREE_PHASE_TARIFF::setTimeInterval1(TariffConfig_t value)
+{
+}
+
+void OR_WE_THREE_PHASE_TARIFF::setTimeInterval2(TariffConfig_t value)
+{
+}
+
+void OR_WE_THREE_PHASE_TARIFF::setTimeInterval3(TariffConfig_t value)
+{
+}
+
+void OR_WE_THREE_PHASE_TARIFF::setTimeInterval4(TariffConfig_t value)
+{
+}
+
+void OR_WE_THREE_PHASE_TARIFF::setTimeInterval5(TariffConfig_t value)
+{
+}
+
+void OR_WE_THREE_PHASE_TARIFF::setTimeInterval6(TariffConfig_t value)
+{
+}
+
+void OR_WE_THREE_PHASE_TARIFF::setTimeInterval7(TariffConfig_t value)
+{
+}
+
+void OR_WE_THREE_PHASE_TARIFF::setTimeInterval8(TariffConfig_t value)
+{
+}
+
+void OR_WE_THREE_PHASE_TARIFF::setTimeZone(TariffConfig_t value) 
+{
+  
 }
 
 //------------------------------------------------------------------------------
@@ -1690,12 +2133,12 @@ float OR_WE_SINGLE_PHASE::getPowerFactor()
 }
 
 //Counter
-TotalCounterTarif_t OR_WE_SINGLE_PHASE::getTotalCounterActivePower()
+TotalCounterTariff_t OR_WE_SINGLE_PHASE::getTotalCounterActivePower()
 {
   uint8_t j;
   uint8_t k;
   uint16_t data[2];
-  TotalCounterTarif_t result;
+  TotalCounterTariff_t result;
 
   _result = _node.readHoldingRegisters(RegisterTotalActivePower, 10);
 
@@ -1739,12 +2182,12 @@ TotalCounterTarif_t OR_WE_SINGLE_PHASE::getTotalCounterActivePower()
   return result;
 }
 
-TotalCounterTarif_t OR_WE_SINGLE_PHASE::getTotalCounterReactivePower()
+TotalCounterTariff_t OR_WE_SINGLE_PHASE::getTotalCounterReactivePower()
 {
   uint8_t j;
   uint8_t k;
   uint16_t data[2];
-  TotalCounterTarif_t result;
+  TotalCounterTariff_t result;
 
   _result = _node.readHoldingRegisters(RegisterTotalReactivePower, 10);
 
@@ -1839,18 +2282,18 @@ void OR_WE_SINGLE_PHASE::setBusBaud(BaudConfig_t value)
 // }
 
 //------------------------------------------------------------------------------
-OR_WE_SINGLE_PHASE_TARIF::OR_WE_SINGLE_PHASE_TARIF(void)
+OR_WE_SINGLE_PHASE_TARIFF::OR_WE_SINGLE_PHASE_TARIFF(void)
 {
 }
 
-TarifConfig_t OR_WE_SINGLE_PHASE_TARIF::getWeekdayTarif()
+TariffConfig_t OR_WE_SINGLE_PHASE_TARIFF::getWeekdayTariff()
 {
   uint8_t j;
   uint8_t k;
   uint16_t data[2];
-  TarifConfig_t result;
+  TariffConfig_t result;
 
-  _result = _node.readHoldingRegisters(RegisterWeekdayTarif, 16);
+  _result = _node.readHoldingRegisters(RegisterWeekdayTariff, 16);
 
   // do something with data if read is successful
   if (_result == _node.ku8MBSuccess)
@@ -1862,7 +2305,7 @@ TarifConfig_t OR_WE_SINGLE_PHASE_TARIF::getWeekdayTarif()
       k++;
       if (k == 2)
       {
-        result.Data[j / 2] = getModbusTarifConfig(data);
+        result.Data[j / 2] = getModbusTariffConfig(data);
         k = 0;
       }
     }
@@ -1870,14 +2313,14 @@ TarifConfig_t OR_WE_SINGLE_PHASE_TARIF::getWeekdayTarif()
   return result;
 }
 
-TarifConfig_t OR_WE_SINGLE_PHASE_TARIF::getWeekendTarif()
+TariffConfig_t OR_WE_SINGLE_PHASE_TARIFF::getWeekendTariff()
 {
   uint8_t j;
   uint8_t k;
   uint16_t data[2];
-  TarifConfig_t result;
+  TariffConfig_t result;
 
-  _result = _node.readHoldingRegisters(RegisterWeekendTarif, 16);
+  _result = _node.readHoldingRegisters(RegisterWeekendTariff, 16);
 
   // do something with data if read is successful
   if (_result == _node.ku8MBSuccess)
@@ -1889,7 +2332,7 @@ TarifConfig_t OR_WE_SINGLE_PHASE_TARIF::getWeekendTarif()
       k++;
       if (k == 2)
       {
-        result.Data[j / 2] = getModbusTarifConfig(data);
+        result.Data[j / 2] = getModbusTariffConfig(data);
         k = 0;
       }
     }
@@ -1897,14 +2340,14 @@ TarifConfig_t OR_WE_SINGLE_PHASE_TARIF::getWeekendTarif()
   return result;
 }
 
-TarifConfig_t OR_WE_SINGLE_PHASE_TARIF::getHolidayTarif()
+TariffConfig_t OR_WE_SINGLE_PHASE_TARIFF::getHolidayTariff()
 {
   uint8_t j;
   uint8_t k;
   uint16_t data[2];
-  TarifConfig_t result;
+  TariffConfig_t result;
 
-  _result = _node.readHoldingRegisters(RegisterHolidayTarif, 16);
+  _result = _node.readHoldingRegisters(RegisterHolidayTariff, 16);
 
   // do something with data if read is successful
   if (_result == _node.ku8MBSuccess)
@@ -1916,7 +2359,7 @@ TarifConfig_t OR_WE_SINGLE_PHASE_TARIF::getHolidayTarif()
       k++;
       if (k == 2)
       {
-        result.Data[j / 2] = getModbusTarifConfig(data);
+        result.Data[j / 2] = getModbusTariffConfig(data);
         k = 0;
       }
     }
@@ -1924,7 +2367,7 @@ TarifConfig_t OR_WE_SINGLE_PHASE_TARIF::getHolidayTarif()
   return result;
 }
 
-HolidayConfig_t OR_WE_SINGLE_PHASE_TARIF::getHoliday()
+HolidayConfig_t OR_WE_SINGLE_PHASE_TARIFF::getHoliday()
 {
   uint8_t j;
   uint16_t data;
@@ -1944,7 +2387,7 @@ HolidayConfig_t OR_WE_SINGLE_PHASE_TARIF::getHoliday()
   return result;
 }
 
-tm OR_WE_SINGLE_PHASE_TARIF::getDateTime()
+tm OR_WE_SINGLE_PHASE_TARIFF::getDateTime()
 {
   uint8_t j;
   uint16_t data[4];
@@ -1964,7 +2407,7 @@ tm OR_WE_SINGLE_PHASE_TARIF::getDateTime()
   return result;
 }
 
-void OR_WE_SINGLE_PHASE_TARIF::setWeekdayTarif(TarifConfig_t value)
+void OR_WE_SINGLE_PHASE_TARIFF::setWeekdayTariff(TariffConfig_t value)
 {
   uint8_t j;
   uint8_t k;
@@ -1972,16 +2415,16 @@ void OR_WE_SINGLE_PHASE_TARIF::setWeekdayTarif(TarifConfig_t value)
 
   for (j = 0; j < 8; j++)
   {
-    data = setModbusTarifConfig(value.Data[j]);
+    data = setModbusTariffConfig(value.Data[j]);
     for (k = 0; k < 2; k++)
     {
       _node.setTransmitBuffer(j * 2 + k, data.value[k]);
     }
   }
-  _result = _node.writeMultipleRegisters(RegisterWeekdayTarif, 16);
+  _result = _node.writeMultipleRegisters(RegisterWeekdayTariff, 16);
 }
 
-void OR_WE_SINGLE_PHASE_TARIF::setWeekendTarif(TarifConfig_t value)
+void OR_WE_SINGLE_PHASE_TARIFF::setWeekendTariff(TariffConfig_t value)
 {
   uint8_t j;
   uint8_t k;
@@ -1989,16 +2432,16 @@ void OR_WE_SINGLE_PHASE_TARIF::setWeekendTarif(TarifConfig_t value)
 
   for (j = 0; j < 8; j++)
   {
-    data = setModbusTarifConfig(value.Data[j]);
+    data = setModbusTariffConfig(value.Data[j]);
     for (k = 0; k < 2; k++)
     {
       _node.setTransmitBuffer(j * 2 + k, data.value[k]);
     }
   }
-  _result = _node.writeMultipleRegisters(RegisterWeekendTarif, 16);
+  _result = _node.writeMultipleRegisters(RegisterWeekendTariff, 16);
 }
 
-void OR_WE_SINGLE_PHASE_TARIF::setHolidayTarif(TarifConfig_t value)
+void OR_WE_SINGLE_PHASE_TARIFF::setHolidayTariff(TariffConfig_t value)
 {
   uint8_t j;
   uint8_t k;
@@ -2006,16 +2449,16 @@ void OR_WE_SINGLE_PHASE_TARIF::setHolidayTarif(TarifConfig_t value)
 
   for (j = 0; j < 8; j++)
   {
-    data = setModbusTarifConfig(value.Data[j]);
+    data = setModbusTariffConfig(value.Data[j]);
     for (k = 0; k < 2; k++)
     {
       _node.setTransmitBuffer(j * 2 + k, data.value[k]);
     }
   }
-  _result = _node.writeMultipleRegisters(RegisterHolidayTarif, 16);
+  _result = _node.writeMultipleRegisters(RegisterHolidayTariff, 16);
 }
 
-void OR_WE_SINGLE_PHASE_TARIF::setHoliday(HolidayConfig_t value)
+void OR_WE_SINGLE_PHASE_TARIFF::setHoliday(HolidayConfig_t value)
 {
   uint8_t j;
 
@@ -2026,7 +2469,7 @@ void OR_WE_SINGLE_PHASE_TARIF::setHoliday(HolidayConfig_t value)
   _result = _node.writeMultipleRegisters(RegisterHoliday, 100);
 }
 
-void OR_WE_SINGLE_PHASE_TARIF::setDateTime(tm value)
+void OR_WE_SINGLE_PHASE_TARIFF::setDateTime(tm value)
 {
   uint8_t j;
   uint16Array_t data;
