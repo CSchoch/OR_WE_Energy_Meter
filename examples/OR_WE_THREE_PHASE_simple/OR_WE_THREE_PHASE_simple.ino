@@ -11,7 +11,7 @@
 #include <OR_WE.h>
 
 // instantiate ModbusMaster object
-OR_WE EnergyMeter;
+OR_WE_THREE_PHASE EnergyMeter;
 
 void setup()
 {
@@ -160,7 +160,7 @@ void loop()
   Serial.print("getMeterId: ");
   Serial.println(EnergyMeter.getMeterId());
   Serial.print("getBusBaud: ");
-  Serial.println(EnergyMeter.getBusBaud());
+  Serial.println(EnergyMeter.getBusBaud().Baud);
   Serial.print("getSoftwareVersion: ");
   Serial.println(EnergyMeter.getSoftwareVersion());
   Serial.print("getHardwareVersion: ");

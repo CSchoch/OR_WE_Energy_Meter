@@ -183,10 +183,10 @@ protected:
   static const uint16_t RegisterDateTime = 0x8120;
 };
 
-class OR_WE_THRE_PHASE : public OR_WE
+class OR_WE_THREE_PHASE : public OR_WE
 {
 public:
-  OR_WE_THRE_PHASE();
+  OR_WE_THREE_PHASE();
 
   //Voltage
   float getVoltageL1();
@@ -384,10 +384,10 @@ protected:
   static const uint16_t RegisterLcdCycleTine = 0x000D; // Todo
 };
 
-class OR_WE_THRE_PHASE_TARIF : public OR_WE_THRE_PHASE
+class OR_WE_THREE_PHASE_TARIF : public OR_WE_THREE_PHASE
 {
 public:
-  OR_WE_THRE_PHASE_TARIF();
+  OR_WE_THREE_PHASE_TARIF();
 
   //Counter Export
   float getExportCounterActivePowerTotal();

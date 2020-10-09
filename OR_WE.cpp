@@ -277,12 +277,12 @@ uint16_t OR_WE::setModbusBaud(BaudConfig_t value)
 }
 
 //------------------------------------------------------------------------------
-OR_WE_THRE_PHASE::OR_WE_THRE_PHASE(void)
+OR_WE_THREE_PHASE::OR_WE_THREE_PHASE(void)
 {
 }
 
 //Voltage
-float OR_WE_THRE_PHASE::getVoltageL1()
+float OR_WE_THREE_PHASE::getVoltageL1()
 {
   uint8_t j;
   uint16_t data[2];
@@ -302,7 +302,7 @@ float OR_WE_THRE_PHASE::getVoltageL1()
   return result;
 }
 
-float OR_WE_THRE_PHASE::getVoltageL2()
+float OR_WE_THREE_PHASE::getVoltageL2()
 {
   uint8_t j;
   uint16_t data[2];
@@ -322,7 +322,7 @@ float OR_WE_THRE_PHASE::getVoltageL2()
   return result;
 }
 
-float OR_WE_THRE_PHASE::getVoltageL3()
+float OR_WE_THREE_PHASE::getVoltageL3()
 {
   uint8_t j;
   uint16_t data[2];
@@ -343,7 +343,7 @@ float OR_WE_THRE_PHASE::getVoltageL3()
 }
 
 //Frequency
-float OR_WE_THRE_PHASE::getFrequency()
+float OR_WE_THREE_PHASE::getFrequency()
 {
   uint8_t j;
   uint16_t data[2];
@@ -364,7 +364,7 @@ float OR_WE_THRE_PHASE::getFrequency()
 }
 
 //Current
-float OR_WE_THRE_PHASE::getCurrentL1()
+float OR_WE_THREE_PHASE::getCurrentL1()
 {
   uint8_t j;
   uint16_t data[2];
@@ -384,7 +384,7 @@ float OR_WE_THRE_PHASE::getCurrentL1()
   return result;
 }
 
-float OR_WE_THRE_PHASE::getCurrentL2()
+float OR_WE_THREE_PHASE::getCurrentL2()
 {
   uint8_t j;
   uint16_t data[2];
@@ -404,7 +404,7 @@ float OR_WE_THRE_PHASE::getCurrentL2()
   return result;
 }
 
-float OR_WE_THRE_PHASE::getCurrentL3()
+float OR_WE_THREE_PHASE::getCurrentL3()
 {
   uint8_t j;
   uint16_t data[2];
@@ -425,7 +425,7 @@ float OR_WE_THRE_PHASE::getCurrentL3()
 }
 
 //Active Power
-float OR_WE_THRE_PHASE::getActivePowerTotal()
+float OR_WE_THREE_PHASE::getActivePowerTotal()
 {
   uint8_t j;
   uint16_t data[2];
@@ -445,7 +445,7 @@ float OR_WE_THRE_PHASE::getActivePowerTotal()
   return result;
 }
 
-float OR_WE_THRE_PHASE::getActivePowerL1()
+float OR_WE_THREE_PHASE::getActivePowerL1()
 {
   uint8_t j;
   uint16_t data[2];
@@ -465,7 +465,7 @@ float OR_WE_THRE_PHASE::getActivePowerL1()
   return result;
 }
 
-float OR_WE_THRE_PHASE::getActivePowerL2()
+float OR_WE_THREE_PHASE::getActivePowerL2()
 {
   uint8_t j;
   uint16_t data[2];
@@ -485,7 +485,7 @@ float OR_WE_THRE_PHASE::getActivePowerL2()
   return result;
 }
 
-float OR_WE_THRE_PHASE::getActivePowerL3()
+float OR_WE_THREE_PHASE::getActivePowerL3()
 {
   uint8_t j;
   uint16_t data[2];
@@ -506,7 +506,7 @@ float OR_WE_THRE_PHASE::getActivePowerL3()
 }
 
 //Reactive Power
-float OR_WE_THRE_PHASE::getReactivePowerTotal()
+float OR_WE_THREE_PHASE::getReactivePowerTotal()
 {
   uint8_t j;
   uint16_t data[2];
@@ -526,7 +526,7 @@ float OR_WE_THRE_PHASE::getReactivePowerTotal()
   return result;
 }
 
-float OR_WE_THRE_PHASE::getReactivePowerL1()
+float OR_WE_THREE_PHASE::getReactivePowerL1()
 {
   uint8_t j;
   uint16_t data[2];
@@ -546,7 +546,7 @@ float OR_WE_THRE_PHASE::getReactivePowerL1()
   return result;
 }
 
-float OR_WE_THRE_PHASE::getReactivePowerL2()
+float OR_WE_THREE_PHASE::getReactivePowerL2()
 {
   uint8_t j;
   uint16_t data[2];
@@ -565,7 +565,7 @@ float OR_WE_THRE_PHASE::getReactivePowerL2()
   }
   return result;
 }
-float OR_WE_THRE_PHASE::getReactivePowerL3()
+float OR_WE_THREE_PHASE::getReactivePowerL3()
 {
   uint8_t j;
   uint16_t data[2];
@@ -586,7 +586,7 @@ float OR_WE_THRE_PHASE::getReactivePowerL3()
 }
 
 //Apparent Power
-float OR_WE_THRE_PHASE::getApparentPowerTotal()
+float OR_WE_THREE_PHASE::getApparentPowerTotal()
 {
   uint8_t j;
   uint16_t data[2];
@@ -605,7 +605,7 @@ float OR_WE_THRE_PHASE::getApparentPowerTotal()
   }
   return result;
 }
-float OR_WE_THRE_PHASE::getApparentPowerL1()
+float OR_WE_THREE_PHASE::getApparentPowerL1()
 {
   uint8_t j;
   uint16_t data[2];
@@ -624,7 +624,7 @@ float OR_WE_THRE_PHASE::getApparentPowerL1()
   }
   return result;
 }
-float OR_WE_THRE_PHASE::getApparentPowerL2()
+float OR_WE_THREE_PHASE::getApparentPowerL2()
 {
   uint8_t j;
   uint16_t data[2];
@@ -643,7 +643,7 @@ float OR_WE_THRE_PHASE::getApparentPowerL2()
   }
   return result;
 }
-float OR_WE_THRE_PHASE::getApparentPowerL3()
+float OR_WE_THREE_PHASE::getApparentPowerL3()
 {
   uint8_t j;
   uint16_t data[2];
@@ -664,7 +664,7 @@ float OR_WE_THRE_PHASE::getApparentPowerL3()
 }
 
 //Power Factor
-float OR_WE_THRE_PHASE::getPowerFactorTotal()
+float OR_WE_THREE_PHASE::getPowerFactorTotal()
 {
   uint8_t j;
   uint16_t data[2];
@@ -683,7 +683,7 @@ float OR_WE_THRE_PHASE::getPowerFactorTotal()
   }
   return result;
 }
-float OR_WE_THRE_PHASE::getPowerFactorL1()
+float OR_WE_THREE_PHASE::getPowerFactorL1()
 {
   uint8_t j;
   uint16_t data[2];
@@ -702,7 +702,7 @@ float OR_WE_THRE_PHASE::getPowerFactorL1()
   }
   return result;
 }
-float OR_WE_THRE_PHASE::getPowerFactorL2()
+float OR_WE_THREE_PHASE::getPowerFactorL2()
 {
   uint8_t j;
   uint16_t data[2];
@@ -721,7 +721,7 @@ float OR_WE_THRE_PHASE::getPowerFactorL2()
   }
   return result;
 }
-float OR_WE_THRE_PHASE::getPowerFactorL3()
+float OR_WE_THREE_PHASE::getPowerFactorL3()
 {
   uint8_t j;
   uint16_t data[2];
@@ -742,7 +742,7 @@ float OR_WE_THRE_PHASE::getPowerFactorL3()
 }
 
 //Counter
-float OR_WE_THRE_PHASE::getTotalCounterActivePowerTotal()
+float OR_WE_THREE_PHASE::getTotalCounterActivePowerTotal()
 {
   uint8_t j;
   uint16_t data[2];
@@ -761,7 +761,7 @@ float OR_WE_THRE_PHASE::getTotalCounterActivePowerTotal()
   }
   return result;
 }
-float OR_WE_THRE_PHASE::getTotalCounterActivePowerL1()
+float OR_WE_THREE_PHASE::getTotalCounterActivePowerL1()
 {
   uint8_t j;
   uint16_t data[2];
@@ -780,7 +780,7 @@ float OR_WE_THRE_PHASE::getTotalCounterActivePowerL1()
   }
   return result;
 }
-float OR_WE_THRE_PHASE::getTotalCounterActivePowerL2()
+float OR_WE_THREE_PHASE::getTotalCounterActivePowerL2()
 {
   uint8_t j;
   uint16_t data[2];
@@ -799,7 +799,7 @@ float OR_WE_THRE_PHASE::getTotalCounterActivePowerL2()
   }
   return result;
 }
-float OR_WE_THRE_PHASE::getTotalCounterActivePowerL3()
+float OR_WE_THREE_PHASE::getTotalCounterActivePowerL3()
 {
   uint8_t j;
   uint16_t data[2];
@@ -819,7 +819,7 @@ float OR_WE_THRE_PHASE::getTotalCounterActivePowerL3()
   return result;
 }
 
-float OR_WE_THRE_PHASE::getTotalCounterReactivePowerTotal()
+float OR_WE_THREE_PHASE::getTotalCounterReactivePowerTotal()
 {
   uint8_t j;
   uint16_t data[2];
@@ -838,7 +838,7 @@ float OR_WE_THRE_PHASE::getTotalCounterReactivePowerTotal()
   }
   return result;
 }
-float OR_WE_THRE_PHASE::getTotalCounterReactivePowerL1()
+float OR_WE_THREE_PHASE::getTotalCounterReactivePowerL1()
 {
   uint8_t j;
   uint16_t data[2];
@@ -857,7 +857,7 @@ float OR_WE_THRE_PHASE::getTotalCounterReactivePowerL1()
   }
   return result;
 }
-float OR_WE_THRE_PHASE::getTotalCounterReactivePowerL2()
+float OR_WE_THREE_PHASE::getTotalCounterReactivePowerL2()
 {
   uint8_t j;
   uint16_t data[2];
@@ -876,7 +876,7 @@ float OR_WE_THRE_PHASE::getTotalCounterReactivePowerL2()
   }
   return result;
 }
-float OR_WE_THRE_PHASE::getTotalCounterReactivePowerL3()
+float OR_WE_THREE_PHASE::getTotalCounterReactivePowerL3()
 {
   uint8_t j;
   uint16_t data[2];
@@ -897,7 +897,7 @@ float OR_WE_THRE_PHASE::getTotalCounterReactivePowerL3()
 }
 
 //Counter Import
-float OR_WE_THRE_PHASE::getImportCounterActivePowerTotal()
+float OR_WE_THREE_PHASE::getImportCounterActivePowerTotal()
 {
   uint8_t j;
   uint16_t data[2];
@@ -916,7 +916,7 @@ float OR_WE_THRE_PHASE::getImportCounterActivePowerTotal()
   }
   return result;
 }
-float OR_WE_THRE_PHASE::getImportCounterActivePowerL1()
+float OR_WE_THREE_PHASE::getImportCounterActivePowerL1()
 {
   uint8_t j;
   uint16_t data[2];
@@ -935,7 +935,7 @@ float OR_WE_THRE_PHASE::getImportCounterActivePowerL1()
   }
   return result;
 }
-float OR_WE_THRE_PHASE::getImportCounterActivePowerL2()
+float OR_WE_THREE_PHASE::getImportCounterActivePowerL2()
 {
   uint8_t j;
   uint16_t data[2];
@@ -954,7 +954,7 @@ float OR_WE_THRE_PHASE::getImportCounterActivePowerL2()
   }
   return result;
 }
-float OR_WE_THRE_PHASE::getImportCounterActivePowerL3()
+float OR_WE_THREE_PHASE::getImportCounterActivePowerL3()
 {
   uint8_t j;
   uint16_t data[2];
@@ -974,7 +974,7 @@ float OR_WE_THRE_PHASE::getImportCounterActivePowerL3()
   return result;
 }
 
-float OR_WE_THRE_PHASE::getImportCounterReactivePowerTotal()
+float OR_WE_THREE_PHASE::getImportCounterReactivePowerTotal()
 {
   uint8_t j;
   uint16_t data[2];
@@ -993,7 +993,7 @@ float OR_WE_THRE_PHASE::getImportCounterReactivePowerTotal()
   }
   return result;
 }
-float OR_WE_THRE_PHASE::getImportCounterReactivePowerL1()
+float OR_WE_THREE_PHASE::getImportCounterReactivePowerL1()
 {
   uint8_t j;
   uint16_t data[2];
@@ -1012,7 +1012,7 @@ float OR_WE_THRE_PHASE::getImportCounterReactivePowerL1()
   }
   return result;
 }
-float OR_WE_THRE_PHASE::getImportCounterReactivePowerL2()
+float OR_WE_THREE_PHASE::getImportCounterReactivePowerL2()
 {
   uint8_t j;
   uint16_t data[2];
@@ -1031,7 +1031,7 @@ float OR_WE_THRE_PHASE::getImportCounterReactivePowerL2()
   }
   return result;
 }
-float OR_WE_THRE_PHASE::getImportCounterReactivePowerL3()
+float OR_WE_THREE_PHASE::getImportCounterReactivePowerL3()
 {
   uint8_t j;
   uint16_t data[2];
@@ -1052,7 +1052,7 @@ float OR_WE_THRE_PHASE::getImportCounterReactivePowerL3()
 }
 
 //Counter Export
-float OR_WE_THRE_PHASE::getExportCounterActivePowerTotal()
+float OR_WE_THREE_PHASE::getExportCounterActivePowerTotal()
 {
   uint8_t j;
   uint16_t data[2];
@@ -1071,7 +1071,7 @@ float OR_WE_THRE_PHASE::getExportCounterActivePowerTotal()
   }
   return result;
 }
-float OR_WE_THRE_PHASE::getExportCounterActivePowerL1()
+float OR_WE_THREE_PHASE::getExportCounterActivePowerL1()
 {
   uint8_t j;
   uint16_t data[2];
@@ -1090,7 +1090,7 @@ float OR_WE_THRE_PHASE::getExportCounterActivePowerL1()
   }
   return result;
 }
-float OR_WE_THRE_PHASE::getExportCounterActivePowerL2()
+float OR_WE_THREE_PHASE::getExportCounterActivePowerL2()
 {
   uint8_t j;
   uint16_t data[2];
@@ -1110,7 +1110,7 @@ float OR_WE_THRE_PHASE::getExportCounterActivePowerL2()
   return result;
 }
 
-float OR_WE_THRE_PHASE::getExportCounterActivePowerL3()
+float OR_WE_THREE_PHASE::getExportCounterActivePowerL3()
 {
   uint8_t j;
   uint16_t data[2];
@@ -1130,7 +1130,7 @@ float OR_WE_THRE_PHASE::getExportCounterActivePowerL3()
   return result;
 }
 
-float OR_WE_THRE_PHASE::getExportCounterReactivePowerTotal()
+float OR_WE_THREE_PHASE::getExportCounterReactivePowerTotal()
 {
   uint8_t j;
   uint16_t data[2];
@@ -1149,7 +1149,7 @@ float OR_WE_THRE_PHASE::getExportCounterReactivePowerTotal()
   }
   return result;
 }
-float OR_WE_THRE_PHASE::getExportCounterReactivePowerL1()
+float OR_WE_THREE_PHASE::getExportCounterReactivePowerL1()
 {
   uint8_t j;
   uint16_t data[2];
@@ -1168,7 +1168,7 @@ float OR_WE_THRE_PHASE::getExportCounterReactivePowerL1()
   }
   return result;
 }
-float OR_WE_THRE_PHASE::getExportCounterReactivePowerL2()
+float OR_WE_THREE_PHASE::getExportCounterReactivePowerL2()
 {
   uint8_t j;
   uint16_t data[2];
@@ -1188,7 +1188,7 @@ float OR_WE_THRE_PHASE::getExportCounterReactivePowerL2()
   return result;
 }
 
-float OR_WE_THRE_PHASE::getExportCounterReactivePowerL3()
+float OR_WE_THREE_PHASE::getExportCounterReactivePowerL3()
 {
   uint8_t j;
   uint16_t data[2];
@@ -1209,7 +1209,7 @@ float OR_WE_THRE_PHASE::getExportCounterReactivePowerL3()
 }
 
 //Other
-uint32_t OR_WE_THRE_PHASE::getSerialNo()
+uint32_t OR_WE_THREE_PHASE::getSerialNo()
 {
   uint8_t j;
   uint16_t data[2];
@@ -1229,7 +1229,7 @@ uint32_t OR_WE_THRE_PHASE::getSerialNo()
   return result;
 }
 
-uint16_t OR_WE_THRE_PHASE::getMeterId()
+uint16_t OR_WE_THREE_PHASE::getMeterId()
 {
   uint16_t result = 0;
 
@@ -1243,7 +1243,7 @@ uint16_t OR_WE_THRE_PHASE::getMeterId()
   return result;
 }
 
-BaudConfig_t OR_WE_THRE_PHASE::getBusBaud()
+BaudConfig_t OR_WE_THREE_PHASE::getBusBaud()
 {
   BaudConfig_t result;
 
@@ -1257,14 +1257,14 @@ BaudConfig_t OR_WE_THRE_PHASE::getBusBaud()
   return result;
 }
 
-void OR_WE_THRE_PHASE::setBusBaud(BaudConfig_t value)
+void OR_WE_THREE_PHASE::setBusBaud(BaudConfig_t value)
 {
   _node.setTransmitBuffer(0, setModbusBaud(value));
 
   _result = _node.writeMultipleRegisters(RegisterBusBaud, 1);
 }
 
-float OR_WE_THRE_PHASE::getSoftwareVersion()
+float OR_WE_THREE_PHASE::getSoftwareVersion()
 {
   uint8_t j;
   uint16_t data[2];
@@ -1284,7 +1284,7 @@ float OR_WE_THRE_PHASE::getSoftwareVersion()
   return result;
 }
 
-float OR_WE_THRE_PHASE::getHardwareVersion()
+float OR_WE_THREE_PHASE::getHardwareVersion()
 {
   uint8_t j;
   uint16_t data[2];
@@ -1304,7 +1304,7 @@ float OR_WE_THRE_PHASE::getHardwareVersion()
   return result;
 }
 
-uint16_t OR_WE_THRE_PHASE::getCountRate()
+uint16_t OR_WE_THREE_PHASE::getCountRate()
 {
   uint16_t result = 0;
 
@@ -1318,7 +1318,7 @@ uint16_t OR_WE_THRE_PHASE::getCountRate()
   return result;
 }
 
-float OR_WE_THRE_PHASE::getS0Rate()
+float OR_WE_THREE_PHASE::getS0Rate()
 {
   uint8_t j;
   uint16_t data[2];
@@ -1338,7 +1338,7 @@ float OR_WE_THRE_PHASE::getS0Rate()
   return result;
 }
 
-uint16_t OR_WE_THRE_PHASE::getA3()
+uint16_t OR_WE_THREE_PHASE::getA3()
 {
   uint16_t result = 0;
 
@@ -1352,7 +1352,7 @@ uint16_t OR_WE_THRE_PHASE::getA3()
   return result;
 }
 
-uint16_t OR_WE_THRE_PHASE::getCycleTime()
+uint16_t OR_WE_THREE_PHASE::getCycleTime()
 {
   uint16_t result = 0;
 
@@ -1366,7 +1366,7 @@ uint16_t OR_WE_THRE_PHASE::getCycleTime()
   return result;
 }
 
-uint16_t OR_WE_THRE_PHASE::getCrc()
+uint16_t OR_WE_THREE_PHASE::getCrc()
 {
   uint16_t result = 0;
 
@@ -1380,7 +1380,7 @@ uint16_t OR_WE_THRE_PHASE::getCrc()
   return result;
 }
 
-uint16_t OR_WE_THRE_PHASE::getCombinedCode()
+uint16_t OR_WE_THREE_PHASE::getCombinedCode()
 {
   uint16_t result = 0;
 
@@ -1395,12 +1395,12 @@ uint16_t OR_WE_THRE_PHASE::getCombinedCode()
 }
 
 //------------------------------------------------------------------------------
-OR_WE_THRE_PHASE_TARIF::OR_WE_THRE_PHASE_TARIF(void)
+OR_WE_THREE_PHASE_TARIF::OR_WE_THREE_PHASE_TARIF(void)
 {
 }
 
 //Counter Export
-float OR_WE_THRE_PHASE_TARIF::getExportCounterActivePowerTotal()
+float OR_WE_THREE_PHASE_TARIF::getExportCounterActivePowerTotal()
 {
   uint8_t j;
   uint16_t data[2];
@@ -1419,7 +1419,7 @@ float OR_WE_THRE_PHASE_TARIF::getExportCounterActivePowerTotal()
   }
   return result;
 }
-float OR_WE_THRE_PHASE_TARIF::getExportCounterActivePowerL1()
+float OR_WE_THREE_PHASE_TARIF::getExportCounterActivePowerL1()
 {
   uint8_t j;
   uint16_t data[2];
@@ -1438,7 +1438,7 @@ float OR_WE_THRE_PHASE_TARIF::getExportCounterActivePowerL1()
   }
   return result;
 }
-float OR_WE_THRE_PHASE_TARIF::getExportCounterActivePowerL2()
+float OR_WE_THREE_PHASE_TARIF::getExportCounterActivePowerL2()
 {
   uint8_t j;
   uint16_t data[2];
@@ -1458,7 +1458,7 @@ float OR_WE_THRE_PHASE_TARIF::getExportCounterActivePowerL2()
   return result;
 }
 
-float OR_WE_THRE_PHASE_TARIF::getExportCounterActivePowerL3()
+float OR_WE_THREE_PHASE_TARIF::getExportCounterActivePowerL3()
 {
   uint8_t j;
   uint16_t data[2];
@@ -1478,7 +1478,7 @@ float OR_WE_THRE_PHASE_TARIF::getExportCounterActivePowerL3()
   return result;
 }
 
-float OR_WE_THRE_PHASE_TARIF::getExportCounterReactivePowerTotal()
+float OR_WE_THREE_PHASE_TARIF::getExportCounterReactivePowerTotal()
 {
   uint8_t j;
   uint16_t data[2];
@@ -1497,7 +1497,7 @@ float OR_WE_THRE_PHASE_TARIF::getExportCounterReactivePowerTotal()
   }
   return result;
 }
-float OR_WE_THRE_PHASE_TARIF::getExportCounterReactivePowerL1()
+float OR_WE_THREE_PHASE_TARIF::getExportCounterReactivePowerL1()
 {
   uint8_t j;
   uint16_t data[2];
@@ -1516,7 +1516,7 @@ float OR_WE_THRE_PHASE_TARIF::getExportCounterReactivePowerL1()
   }
   return result;
 }
-float OR_WE_THRE_PHASE_TARIF::getExportCounterReactivePowerL2()
+float OR_WE_THREE_PHASE_TARIF::getExportCounterReactivePowerL2()
 {
   uint8_t j;
   uint16_t data[2];
@@ -1536,7 +1536,7 @@ float OR_WE_THRE_PHASE_TARIF::getExportCounterReactivePowerL2()
   return result;
 }
 
-float OR_WE_THRE_PHASE_TARIF::getExportCounterReactivePowerL3()
+float OR_WE_THREE_PHASE_TARIF::getExportCounterReactivePowerL3()
 {
   uint8_t j;
   uint16_t data[2];
