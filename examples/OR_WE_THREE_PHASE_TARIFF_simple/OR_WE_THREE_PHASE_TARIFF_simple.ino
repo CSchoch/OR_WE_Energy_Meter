@@ -11,7 +11,7 @@
 #include <OR_WE.h>
 
 // instantiate ModbusMaster object
-OR_WE_THREE_PHASE EnergyMeter;
+OR_WE_THREE_PHASE_TARIFF EnergyMeter;
 
 void setup()
 {
@@ -25,8 +25,13 @@ void setup()
 
 void loop()
 {
-  tm dateTimeValue;
   float value;
+  TotalCounterTariff_t counterValue;
+  TariffConfig_t tarifConfigValue;
+  HolidayWeekendConfig_t holidayWeekendConfigValue;
+  TimeZoneConfig_t timeZoneConfigValue;
+  tm dateTimeValue;
+
   // Voltage
   Serial.println("Voltage");
   value = EnergyMeter.getVoltageL1();
@@ -323,6 +328,189 @@ void loop()
   EnergyMeter.setDateTime(dateTimeValue);
   Serial.println(EnergyMeter.getErrCode());
 
+  Serial.print("get/setHolidayWeekendTariff:");
+  for (uint16_t i = 1; i <= 8; i++)
+  {
+    holidayWeekendConfigValue.Weekend = i;
+    holidayWeekendConfigValue.Holiday = 9 - i;
+    EnergyMeter.setHolidayWeekendTariff(holidayWeekendConfigValue);
+    Serial.println(EnergyMeter.getErrCode());
+    holidayWeekendConfigValue = EnergyMeter.getHolidayWeekendTariff();
+    Serial.print(" Weekend: ");
+    Serial.print(holidayWeekendConfigValue.Weekend);
+    Serial.print(" Holiday: ");
+    Serial.println(holidayWeekendConfigValue.Holiday);
+  }
+  Serial.print("get/setTimeInterval1: ");
+  for (uint16_t i = 0; i < 8; i++)
+  {
+    tarifConfigValue.Data[i].Hour = i + 1;
+    tarifConfigValue.Data[i].Minute = i + 11;
+    tarifConfigValue.Data[i].TariffIndex = (i % 4) + 1;
+  }
+  EnergyMeter.setTimeInterval1(tarifConfigValue);
+  tarifConfigValue = EnergyMeter.getTimeInterval1();
+  for (uint16_t i = 0; i < 8; i++)
+  {
+    Serial.print(tarifConfigValue.Data[i].Hour);
+    Serial.print(":");
+    Serial.print(tarifConfigValue.Data[i].Minute);
+    Serial.print(" T");
+    Serial.print(tarifConfigValue.Data[i].TariffIndex);
+    Serial.print(" ");
+  }
+  Serial.println("");
+  Serial.print("get/setTimeInterval2: ");
+  for (uint16_t i = 0; i < 8; i++)
+  {
+    tarifConfigValue.Data[i].Hour = i + 1;
+    tarifConfigValue.Data[i].Minute = i + 11;
+    tarifConfigValue.Data[i].TariffIndex = (i % 4) + 1;
+  }
+  EnergyMeter.setTimeInterval2(tarifConfigValue);
+  tarifConfigValue = EnergyMeter.getTimeInterval2();
+  for (uint16_t i = 0; i < 8; i++)
+  {
+    Serial.print(tarifConfigValue.Data[i].Hour);
+    Serial.print(":");
+    Serial.print(tarifConfigValue.Data[i].Minute);
+    Serial.print(" T");
+    Serial.print(tarifConfigValue.Data[i].TariffIndex);
+    Serial.print(" ");
+  }
+  Serial.println("");
+  Serial.print("get/setTimeInterval3: ");
+  for (uint16_t i = 0; i < 8; i++)
+  {
+    tarifConfigValue.Data[i].Hour = i + 1;
+    tarifConfigValue.Data[i].Minute = i + 11;
+    tarifConfigValue.Data[i].TariffIndex = (i % 4) + 1;
+  }
+  EnergyMeter.setTimeInterval3(tarifConfigValue);
+  tarifConfigValue = EnergyMeter.getTimeInterval3();
+  for (uint16_t i = 0; i < 8; i++)
+  {
+    Serial.print(tarifConfigValue.Data[i].Hour);
+    Serial.print(":");
+    Serial.print(tarifConfigValue.Data[i].Minute);
+    Serial.print(" T");
+    Serial.print(tarifConfigValue.Data[i].TariffIndex);
+    Serial.print(" ");
+  }
+  Serial.println("");
+  Serial.print("get/setTimeInterval4: ");
+  for (uint16_t i = 0; i < 8; i++)
+  {
+    tarifConfigValue.Data[i].Hour = i + 1;
+    tarifConfigValue.Data[i].Minute = i + 11;
+    tarifConfigValue.Data[i].TariffIndex = (i % 4) + 1;
+  }
+  EnergyMeter.setTimeInterval4(tarifConfigValue);
+  tarifConfigValue = EnergyMeter.getTimeInterval4();
+  for (uint16_t i = 0; i < 8; i++)
+  {
+    Serial.print(tarifConfigValue.Data[i].Hour);
+    Serial.print(":");
+    Serial.print(tarifConfigValue.Data[i].Minute);
+    Serial.print(" T");
+    Serial.print(tarifConfigValue.Data[i].TariffIndex);
+    Serial.print(" ");
+  }
+  Serial.println("");
+  Serial.print("get/setTimeInterval5: ");
+  for (uint16_t i = 0; i < 8; i++)
+  {
+    tarifConfigValue.Data[i].Hour = i + 1;
+    tarifConfigValue.Data[i].Minute = i + 11;
+    tarifConfigValue.Data[i].TariffIndex = (i % 4) + 1;
+  }
+  EnergyMeter.setTimeInterval5(tarifConfigValue);
+  tarifConfigValue = EnergyMeter.getTimeInterval5();
+  for (uint16_t i = 0; i < 8; i++)
+  {
+    Serial.print(tarifConfigValue.Data[i].Hour);
+    Serial.print(":");
+    Serial.print(tarifConfigValue.Data[i].Minute);
+    Serial.print(" T");
+    Serial.print(tarifConfigValue.Data[i].TariffIndex);
+    Serial.print(" ");
+  }
+  Serial.println("");
+  Serial.print("get/setTimeInterval6: ");
+  for (uint16_t i = 0; i < 8; i++)
+  {
+    tarifConfigValue.Data[i].Hour = i + 1;
+    tarifConfigValue.Data[i].Minute = i + 11;
+    tarifConfigValue.Data[i].TariffIndex = (i % 4) + 1;
+  }
+  EnergyMeter.setTimeInterval6(tarifConfigValue);
+  tarifConfigValue = EnergyMeter.getTimeInterval6();
+  for (uint16_t i = 0; i < 8; i++)
+  {
+    Serial.print(tarifConfigValue.Data[i].Hour);
+    Serial.print(":");
+    Serial.print(tarifConfigValue.Data[i].Minute);
+    Serial.print(" T");
+    Serial.print(tarifConfigValue.Data[i].TariffIndex);
+    Serial.print(" ");
+  }
+  Serial.println("");
+  Serial.print("get/setTimeInterval7: ");
+  for (uint16_t i = 0; i < 8; i++)
+  {
+    tarifConfigValue.Data[i].Hour = i + 1;
+    tarifConfigValue.Data[i].Minute = i + 11;
+    tarifConfigValue.Data[i].TariffIndex = (i % 4) + 1;
+  }
+  EnergyMeter.setTimeInterval7(tarifConfigValue);
+  tarifConfigValue = EnergyMeter.getTimeInterval7();
+  for (uint16_t i = 0; i < 8; i++)
+  {
+    Serial.print(tarifConfigValue.Data[i].Hour);
+    Serial.print(":");
+    Serial.print(tarifConfigValue.Data[i].Minute);
+    Serial.print(" T");
+    Serial.print(tarifConfigValue.Data[i].TariffIndex);
+    Serial.print(" ");
+  }
+  Serial.println("");
+  Serial.print("get/setTimeInterval8: ");
+  for (uint16_t i = 0; i < 8; i++)
+  {
+    tarifConfigValue.Data[i].Hour = i + 1;
+    tarifConfigValue.Data[i].Minute = i + 11;
+    tarifConfigValue.Data[i].TariffIndex = (i % 4) + 1;
+  }
+  EnergyMeter.setTimeInterval8(tarifConfigValue);
+  tarifConfigValue = EnergyMeter.getTimeInterval8();
+  for (uint16_t i = 0; i < 8; i++)
+  {
+    Serial.print(tarifConfigValue.Data[i].Hour);
+    Serial.print(":");
+    Serial.print(tarifConfigValue.Data[i].Minute);
+    Serial.print(" T");
+    Serial.print(tarifConfigValue.Data[i].TariffIndex);
+    Serial.print(" ");
+  }
+  Serial.println("");
+  Serial.print("get/setTimeZone: ");
+  for (uint16_t i = 0; i < 8; i++)
+  {
+    timeZoneConfigValue.Data[i].Day = i + 11;
+    timeZoneConfigValue.Data[i].Month = i + 1;
+    timeZoneConfigValue.Data[i].TimeIntervall = i + 1;
+  }
+  EnergyMeter.setTimeZone(timeZoneConfigValue);
+  timeZoneConfigValue = EnergyMeter.getTimeZone();
+  for (uint16_t i = 0; i < 8; i++)
+  {
+    Serial.print(timeZoneConfigValue.Data[i].Day);
+    Serial.print(".");
+    Serial.print(timeZoneConfigValue.Data[i].Month);
+    Serial.print(" Offset ");
+    Serial.print(timeZoneConfigValue.Data[i].TimeIntervall);
+    Serial.print(" ");
+  }
   Serial.println("");
   delay(500);
 }

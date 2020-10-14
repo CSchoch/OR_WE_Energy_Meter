@@ -82,58 +82,6 @@ uint32_t OR_WE::getModbusUint32(uint16_t data[2])
   return dest.val;
 }
 
-tm OR_WE::getModbusTime(uint16_t data[4])
-{
-  union u_data
-  {
-    byte b[8];
-    uint16_t data[4];
-  } source;
-
-  tm dest;
-
-  source.data[0] = data[0];
-  source.data[1] = data[1];
-  source.data[2] = data[2];
-  source.data[3] = data[3];
-
-  dest.tm_mon = source.b[1];
-  dest.tm_mday = source.b[0];
-  dest.tm_year = source.b[3];
-  dest.tm_hour = source.b[2];
-  dest.tm_min = source.b[5];
-  dest.tm_sec = source.b[4];
-  dest.tm_wday = source.b[7];
-
-  return dest;
-}
-
-uint16Array_t OR_WE::setModbusTime(tm value)
-{
-  union u_data
-  {
-    byte b[8];
-    uint16_t data[4];
-  } source;
-
-  uint16Array_t dest;
-
-  source.b[1] = value.tm_mon;
-  source.b[0] = value.tm_mday;
-  source.b[3] = value.tm_year;
-  source.b[2] = value.tm_hour;
-  source.b[5] = value.tm_min;
-  source.b[4] = value.tm_sec;
-  source.b[7] = value.tm_wday;
-
-  dest.value[0] = source.data[0];
-  dest.value[1] = source.data[1];
-  dest.value[2] = source.data[2];
-  dest.value[3] = source.data[3];
-
-  return dest;
-}
-
 TariffConfigData_t OR_WE::getModbusTariffConfig(uint16_t data[2])
 {
   union u_data
@@ -276,9 +224,116 @@ uint16_t OR_WE::setModbusBaud(BaudConfig_t value)
   return source.data;
 }
 
+TimeZoneConfigData_t OR_WE::getModbusTimeZoneConfig(uint16_t data[2])
+{
+  union u_data
+  {
+    byte b[4];
+    uint16_t data[2];
+  } source;
+
+  TimeZoneConfigData_t dest;
+
+  source.data[0] = data[0];
+  source.data[1] = data[1];
+
+  dest.Month = source.b[1];
+  dest.Day = source.b[0];
+  dest.TimeIntervall = source.b[2];
+
+  return dest;
+}
+
+uint16Array_t OR_WE::setModbusTimeZoneConfig(TimeZoneConfigData_t value)
+{
+  union u_data
+  {
+    byte b[4];
+    uint16_t data[2];
+  } source;
+
+  uint16Array_t dest;
+
+  source.b[1] = value.Month;
+  source.b[0] = value.Day;
+  source.b[2] = value.TimeIntervall;
+
+  dest.value[0] = source.data[0];
+  dest.value[1] = source.data[1];
+
+  return dest;
+}
+
 //------------------------------------------------------------------------------
 OR_WE_THREE_PHASE::OR_WE_THREE_PHASE(void)
 {
+}
+
+tm OR_WE_THREE_PHASE::getModbusTime(uint16_t data[4])
+{
+  union u_data
+  {
+    byte b[8];
+    uint16_t data[4];
+  } source;
+
+  tm dest;
+
+  source.data[0] = data[0];
+  source.data[1] = data[1];
+  source.data[2] = data[2];
+  source.data[3] = data[3];
+
+  // weird conversion because hex 10 = dec 10
+  dest.tm_sec = getModbusTimeValue(source.b[1]);
+  dest.tm_min = getModbusTimeValue(source.b[0]);
+  dest.tm_hour = getModbusTimeValue(source.b[3]);
+  dest.tm_wday = getModbusTimeValue(source.b[2]);
+  dest.tm_mday = getModbusTimeValue(source.b[5]);
+  dest.tm_mon = getModbusTimeValue(source.b[4]);
+  dest.tm_year = getModbusTimeValue(source.b[7]);
+
+  return dest;
+}
+
+uint16Array_t OR_WE_THREE_PHASE::setModbusTime(tm value)
+{
+  union u_data
+  {
+    byte b[8];
+    uint16_t data[4];
+  } source;
+
+  uint16Array_t dest;
+
+  // weird conversion because hex 10 = dec 10
+  source.b[1] = setModbusTimeValue(value.tm_sec);
+  source.b[0] = setModbusTimeValue(value.tm_min);
+  source.b[3] = setModbusTimeValue(value.tm_hour);
+  source.b[2] = setModbusTimeValue(value.tm_wday);
+  source.b[5] = setModbusTimeValue(value.tm_mday);
+  source.b[4] = setModbusTimeValue(value.tm_mon);
+  source.b[7] = setModbusTimeValue(value.tm_year);
+  source.b[6] = 0;
+
+  dest.value[0] = source.data[0];
+  dest.value[1] = source.data[1];
+  dest.value[2] = source.data[2];
+  dest.value[3] = source.data[3];
+
+  return dest;
+}
+
+uint16_t OR_WE_THREE_PHASE::getModbusTimeValue(uint16_t value)
+{
+  // weird conversion because hex 10 = dec 10
+  return value - (trunc(value / 16) * 6);
+}
+
+uint16_t OR_WE_THREE_PHASE::setModbusTimeValue(uint16_t value)
+{
+  // weird conversion because hex 10 = dec 10
+  return value + (trunc(value / 10) * 6);
 }
 
 //Voltage
@@ -1715,7 +1770,7 @@ uint32_t OR_WE_THREE_PHASE::getSerialNo()
 
 uint16_t OR_WE_THREE_PHASE::getMeterId()
 {
-  uint16_t result = 0;
+  uint16_t result = -1;
 
   _result = _node.readHoldingRegisters(RegisterMeterId, 1);
 
@@ -1727,45 +1782,57 @@ uint16_t OR_WE_THREE_PHASE::getMeterId()
   return result;
 }
 
-BaudConfig_t OR_WE_THREE_PHASE::getBusBaud()
+uint16_t OR_WE_THREE_PHASE::getBusBaud()
 {
-  BaudConfig_t result;
+  uint16_t result = -1;
 
   _result = _node.readHoldingRegisters(RegisterBusBaud, 1);
 
   // do something with data if read is successful
   if (_result == _node.ku8MBSuccess)
   {
-    result = getModbusBaud(_node.getResponseBuffer(0));
+    result = _node.getResponseBuffer(0);
   }
   return result;
 }
 
-void OR_WE_THREE_PHASE::setBusBaud(BaudConfig_t value)
+void OR_WE_THREE_PHASE::setBusBaud(uint16_t value)
 {
-  _node.setTransmitBuffer(0, setModbusBaud(value));
+  _node.setTransmitBuffer(0, value);
 
   _result = _node.writeMultipleRegisters(RegisterBusBaud, 1);
 }
 
-void OR_WE_THREE_PHASE::setS0Rate(float value) 
+void OR_WE_THREE_PHASE::setS0Rate(float value)
 {
-  
 }
 
-void OR_WE_THREE_PHASE::setCombinedCode(uint16_t value) 
+void OR_WE_THREE_PHASE::setCombinedCode(uint16_t value)
 {
-  
+  _node.setTransmitBuffer(0, value);
+
+  _result = _node.writeMultipleRegisters(RegisterCombinedCode, 1);
 }
 
-void OR_WE_THREE_PHASE::setLcdCycleTime(uint16_t value) 
+void OR_WE_THREE_PHASE::setLcdCycleTime(uint16_t value)
 {
-  
+  // weird conversion because hex 10 = dec 10
+  _node.setTransmitBuffer(0, setModbusTimeValue(value));
+
+  _result = _node.writeMultipleRegisters(RegisterLcdCycleTime, 1);
 }
 
-void OR_WE_THREE_PHASE::setDateTime(tm value) 
+void OR_WE_THREE_PHASE::setDateTime(tm value)
 {
-  
+  uint8_t j;
+  uint16Array_t data;
+
+  data = setModbusTime(value);
+  for (j = 0; j < 4; j++)
+  {
+    _node.setTransmitBuffer(j, data.value[j]);
+  }
+  _result = _node.writeMultipleRegisters(RegisterDateTime, 4);
 }
 
 float OR_WE_THREE_PHASE::getSoftwareVersion()
@@ -1808,20 +1875,6 @@ float OR_WE_THREE_PHASE::getHardwareVersion()
   return result;
 }
 
-uint16_t OR_WE_THREE_PHASE::getCountRate()
-{
-  uint16_t result = 0;
-
-  _result = _node.readHoldingRegisters(RegisterCountRate, 1);
-
-  // do something with data if read is successful
-  if (_result == _node.ku8MBSuccess)
-  {
-    result = _node.getResponseBuffer(0);
-  }
-  return result;
-}
-
 float OR_WE_THREE_PHASE::getS0Rate()
 {
   uint8_t j;
@@ -1842,30 +1895,16 @@ float OR_WE_THREE_PHASE::getS0Rate()
   return result;
 }
 
-uint16_t OR_WE_THREE_PHASE::getA3()
+uint16_t OR_WE_THREE_PHASE::getLcdCycleTime()
 {
   uint16_t result = 0;
 
-  _result = _node.readHoldingRegisters(RegisterA3, 1);
+  _result = _node.readHoldingRegisters(RegisterLcdCycleTime, 1);
 
   // do something with data if read is successful
   if (_result == _node.ku8MBSuccess)
   {
-    result = _node.getResponseBuffer(0);
-  }
-  return result;
-}
-
-uint16_t OR_WE_THREE_PHASE::getCycleTime()
-{
-  uint16_t result = 0;
-
-  _result = _node.readHoldingRegisters(RegisterCycleTime, 1);
-
-  // do something with data if read is successful
-  if (_result == _node.ku8MBSuccess)
-  {
-    result = _node.getResponseBuffer(0);
+    result = getModbusTimeValue(_node.getResponseBuffer(0));
   }
   return result;
 }
@@ -1898,19 +1937,31 @@ uint16_t OR_WE_THREE_PHASE::getCombinedCode()
   return result;
 }
 
-uint16_t OR_WE_THREE_PHASE::getLcdCycleTime() 
+tm OR_WE_THREE_PHASE::getDateTime()
 {
-  
+  uint8_t j;
+  uint16_t data[4];
+  tm result;
+
+  _result = _node.readHoldingRegisters(RegisterDateTime, 4);
+
+  // do something with data if read is successful
+  if (_result == _node.ku8MBSuccess)
+  {
+    for (j = 0; j < 4; j++)
+    {
+      data[j] = _node.getResponseBuffer(j);
+    }
+    result = getModbusTime(data);
+  }
+  return result;
 }
 
-tm OR_WE_THREE_PHASE::getDateTime() 
+void OR_WE_THREE_PHASE::setMeterId(uint16_t value)
 {
-  
-}
+  _node.setTransmitBuffer(0, value);
 
-void OR_WE_THREE_PHASE::setMeterId(uint16_t value) 
-{
-  
+  _result = _node.writeMultipleRegisters(RegisterMeterId, 1);
 }
 
 //------------------------------------------------------------------------------
@@ -1918,90 +1969,1088 @@ OR_WE_THREE_PHASE_TARIFF::OR_WE_THREE_PHASE_TARIFF()
 {
 }
 
-HolidayConfig_t OR_WE_THREE_PHASE_TARIFF::getHolidayWeekendTariff()
+HolidayWeekendConfig_t OR_WE_THREE_PHASE_TARIFF::getModbusHolidayWeekend(uint16_t data)
 {
+  union u_data
+  {
+    byte b[2];
+    uint16_t data;
+  } source;
+
+  HolidayWeekendConfig_t dest;
+
+  source.data = data;
+
+  dest.Holiday = source.b[0];
+  dest.Weekend = source.b[1];
+
+  return dest;
+}
+
+uint16_t OR_WE_THREE_PHASE_TARIFF::setModbusHolidayWeekend(HolidayWeekendConfig_t value)
+{
+  union u_data
+  {
+    byte b[2];
+    uint16_t data;
+  } source;
+
+  source.b[0] = value.Holiday;
+  source.b[1] = value.Weekend;
+
+  return source.data;
+}
+
+HolidayWeekendConfig_t OR_WE_THREE_PHASE_TARIFF::getHolidayWeekendTariff()
+{
+  HolidayWeekendConfig_t result;
+
+  _result = _node.readHoldingRegisters(RegisterHolidayWeekendTariff, 1);
+
+  // do something with data if read is successful
+  if (_result == _node.ku8MBSuccess)
+  {
+    result = getModbusHolidayWeekend(_node.getResponseBuffer(0));
+  }
+
+  return result;
 }
 
 TariffConfig_t OR_WE_THREE_PHASE_TARIFF::getTimeInterval1()
 {
+  uint8_t j;
+  TariffConfig_t result;
+
+  union u_data
+  {
+    byte b[24];
+    uint16_t data[12];
+  } source;
+
+  _result = _node.readHoldingRegisters(RegisterTimeInterval1, 12);
+
+  // do something with data if read is successful
+  if (_result == _node.ku8MBSuccess)
+  {
+    for (j = 0; j < 12; j++)
+    {
+      source.data[j] = _node.getResponseBuffer(j);
+    }
+  }
+
+  j = 0;
+  result.Data[j].Hour = getModbusTimeValue(source.b[1]);
+  result.Data[j].Minute = getModbusTimeValue(source.b[0]);
+  result.Data[j].TariffIndex = getModbusTimeValue(source.b[3]);
+  j = 1;
+  result.Data[j].Hour = getModbusTimeValue(source.b[2]);
+  result.Data[j].Minute = getModbusTimeValue(source.b[5]);
+  result.Data[j].TariffIndex = getModbusTimeValue(source.b[4]);
+  j = 2;
+  result.Data[j].Hour = getModbusTimeValue(source.b[7]);
+  result.Data[j].Minute = getModbusTimeValue(source.b[6]);
+  result.Data[j].TariffIndex = getModbusTimeValue(source.b[9]);
+  j = 3;
+  result.Data[j].Hour = getModbusTimeValue(source.b[8]);
+  result.Data[j].Minute = getModbusTimeValue(source.b[11]);
+  result.Data[j].TariffIndex = getModbusTimeValue(source.b[10]);
+  j = 4;
+  result.Data[j].Hour = getModbusTimeValue(source.b[13]);
+  result.Data[j].Minute = getModbusTimeValue(source.b[12]);
+  result.Data[j].TariffIndex = getModbusTimeValue(source.b[15]);
+  j = 5;
+  result.Data[j].Hour = getModbusTimeValue(source.b[14]);
+  result.Data[j].Minute = getModbusTimeValue(source.b[17]);
+  result.Data[j].TariffIndex = getModbusTimeValue(source.b[16]);
+  j = 6;
+  result.Data[j].Hour = getModbusTimeValue(source.b[19]);
+  result.Data[j].Minute = getModbusTimeValue(source.b[18]);
+  result.Data[j].TariffIndex = getModbusTimeValue(source.b[21]);
+  j = 7;
+  result.Data[j].Hour = getModbusTimeValue(source.b[20]);
+  result.Data[j].Minute = getModbusTimeValue(source.b[23]);
+  result.Data[j].TariffIndex = getModbusTimeValue(source.b[22]);
+
+  return result;
 }
 
 TariffConfig_t OR_WE_THREE_PHASE_TARIFF::getTimeInterval2()
 {
+  uint8_t j;
+  TariffConfig_t result;
+
+  union u_data
+  {
+    byte b[24];
+    uint16_t data[12];
+  } source;
+
+  _result = _node.readHoldingRegisters(RegisterTimeInterval2, 12);
+
+  // do something with data if read is successful
+  if (_result == _node.ku8MBSuccess)
+  {
+    for (j = 0; j < 12; j++)
+    {
+      source.data[j] = _node.getResponseBuffer(j);
+    }
+  }
+
+  j = 0;
+  result.Data[j].Hour = getModbusTimeValue(source.b[1]);
+  result.Data[j].Minute = getModbusTimeValue(source.b[0]);
+  result.Data[j].TariffIndex = getModbusTimeValue(source.b[3]);
+  j = 1;
+  result.Data[j].Hour = getModbusTimeValue(source.b[2]);
+  result.Data[j].Minute = getModbusTimeValue(source.b[5]);
+  result.Data[j].TariffIndex = getModbusTimeValue(source.b[4]);
+  j = 2;
+  result.Data[j].Hour = getModbusTimeValue(source.b[7]);
+  result.Data[j].Minute = getModbusTimeValue(source.b[6]);
+  result.Data[j].TariffIndex = getModbusTimeValue(source.b[9]);
+  j = 3;
+  result.Data[j].Hour = getModbusTimeValue(source.b[8]);
+  result.Data[j].Minute = getModbusTimeValue(source.b[11]);
+  result.Data[j].TariffIndex = getModbusTimeValue(source.b[10]);
+  j = 4;
+  result.Data[j].Hour = getModbusTimeValue(source.b[13]);
+  result.Data[j].Minute = getModbusTimeValue(source.b[12]);
+  result.Data[j].TariffIndex = getModbusTimeValue(source.b[15]);
+  j = 5;
+  result.Data[j].Hour = getModbusTimeValue(source.b[14]);
+  result.Data[j].Minute = getModbusTimeValue(source.b[17]);
+  result.Data[j].TariffIndex = getModbusTimeValue(source.b[16]);
+  j = 6;
+  result.Data[j].Hour = getModbusTimeValue(source.b[19]);
+  result.Data[j].Minute = getModbusTimeValue(source.b[18]);
+  result.Data[j].TariffIndex = getModbusTimeValue(source.b[21]);
+  j = 7;
+  result.Data[j].Hour = getModbusTimeValue(source.b[20]);
+  result.Data[j].Minute = getModbusTimeValue(source.b[23]);
+  result.Data[j].TariffIndex = getModbusTimeValue(source.b[22]);
+
+  return result;
 }
 
 TariffConfig_t OR_WE_THREE_PHASE_TARIFF::getTimeInterval3()
 {
+  uint8_t j;
+  TariffConfig_t result;
+
+  union u_data
+  {
+    byte b[24];
+    uint16_t data[12];
+  } source;
+
+  _result = _node.readHoldingRegisters(RegisterTimeInterval3, 12);
+
+  // do something with data if read is successful
+  if (_result == _node.ku8MBSuccess)
+  {
+    for (j = 0; j < 12; j++)
+    {
+      source.data[j] = _node.getResponseBuffer(j);
+    }
+  }
+
+  j = 0;
+  result.Data[j].Hour = getModbusTimeValue(source.b[1]);
+  result.Data[j].Minute = getModbusTimeValue(source.b[0]);
+  result.Data[j].TariffIndex = getModbusTimeValue(source.b[3]);
+  j = 1;
+  result.Data[j].Hour = getModbusTimeValue(source.b[2]);
+  result.Data[j].Minute = getModbusTimeValue(source.b[5]);
+  result.Data[j].TariffIndex = getModbusTimeValue(source.b[4]);
+  j = 2;
+  result.Data[j].Hour = getModbusTimeValue(source.b[7]);
+  result.Data[j].Minute = getModbusTimeValue(source.b[6]);
+  result.Data[j].TariffIndex = getModbusTimeValue(source.b[9]);
+  j = 3;
+  result.Data[j].Hour = getModbusTimeValue(source.b[8]);
+  result.Data[j].Minute = getModbusTimeValue(source.b[11]);
+  result.Data[j].TariffIndex = getModbusTimeValue(source.b[10]);
+  j = 4;
+  result.Data[j].Hour = getModbusTimeValue(source.b[13]);
+  result.Data[j].Minute = getModbusTimeValue(source.b[12]);
+  result.Data[j].TariffIndex = getModbusTimeValue(source.b[15]);
+  j = 5;
+  result.Data[j].Hour = getModbusTimeValue(source.b[14]);
+  result.Data[j].Minute = getModbusTimeValue(source.b[17]);
+  result.Data[j].TariffIndex = getModbusTimeValue(source.b[16]);
+  j = 6;
+  result.Data[j].Hour = getModbusTimeValue(source.b[19]);
+  result.Data[j].Minute = getModbusTimeValue(source.b[18]);
+  result.Data[j].TariffIndex = getModbusTimeValue(source.b[21]);
+  j = 7;
+  result.Data[j].Hour = getModbusTimeValue(source.b[20]);
+  result.Data[j].Minute = getModbusTimeValue(source.b[23]);
+  result.Data[j].TariffIndex = getModbusTimeValue(source.b[22]);
+
+  return result;
 }
 
 TariffConfig_t OR_WE_THREE_PHASE_TARIFF::getTimeInterval4()
 {
+  uint8_t j;
+  TariffConfig_t result;
+
+  union u_data
+  {
+    byte b[24];
+    uint16_t data[12];
+  } source;
+
+  _result = _node.readHoldingRegisters(RegisterTimeInterval4, 12);
+
+  // do something with data if read is successful
+  if (_result == _node.ku8MBSuccess)
+  {
+    for (j = 0; j < 12; j++)
+    {
+      source.data[j] = _node.getResponseBuffer(j);
+    }
+  }
+
+  j = 0;
+  result.Data[j].Hour = getModbusTimeValue(source.b[1]);
+  result.Data[j].Minute = getModbusTimeValue(source.b[0]);
+  result.Data[j].TariffIndex = getModbusTimeValue(source.b[3]);
+  j = 1;
+  result.Data[j].Hour = getModbusTimeValue(source.b[2]);
+  result.Data[j].Minute = getModbusTimeValue(source.b[5]);
+  result.Data[j].TariffIndex = getModbusTimeValue(source.b[4]);
+  j = 2;
+  result.Data[j].Hour = getModbusTimeValue(source.b[7]);
+  result.Data[j].Minute = getModbusTimeValue(source.b[6]);
+  result.Data[j].TariffIndex = getModbusTimeValue(source.b[9]);
+  j = 3;
+  result.Data[j].Hour = getModbusTimeValue(source.b[8]);
+  result.Data[j].Minute = getModbusTimeValue(source.b[11]);
+  result.Data[j].TariffIndex = getModbusTimeValue(source.b[10]);
+  j = 4;
+  result.Data[j].Hour = getModbusTimeValue(source.b[13]);
+  result.Data[j].Minute = getModbusTimeValue(source.b[12]);
+  result.Data[j].TariffIndex = getModbusTimeValue(source.b[15]);
+  j = 5;
+  result.Data[j].Hour = getModbusTimeValue(source.b[14]);
+  result.Data[j].Minute = getModbusTimeValue(source.b[17]);
+  result.Data[j].TariffIndex = getModbusTimeValue(source.b[16]);
+  j = 6;
+  result.Data[j].Hour = getModbusTimeValue(source.b[19]);
+  result.Data[j].Minute = getModbusTimeValue(source.b[18]);
+  result.Data[j].TariffIndex = getModbusTimeValue(source.b[21]);
+  j = 7;
+  result.Data[j].Hour = getModbusTimeValue(source.b[20]);
+  result.Data[j].Minute = getModbusTimeValue(source.b[23]);
+  result.Data[j].TariffIndex = getModbusTimeValue(source.b[22]);
+
+  return result;
 }
 
 TariffConfig_t OR_WE_THREE_PHASE_TARIFF::getTimeInterval5()
 {
+  uint8_t j;
+  TariffConfig_t result;
+
+  union u_data
+  {
+    byte b[24];
+    uint16_t data[12];
+  } source;
+
+  _result = _node.readHoldingRegisters(RegisterTimeInterval5, 12);
+
+  // do something with data if read is successful
+  if (_result == _node.ku8MBSuccess)
+  {
+    for (j = 0; j < 12; j++)
+    {
+      source.data[j] = _node.getResponseBuffer(j);
+    }
+  }
+
+  j = 0;
+  result.Data[j].Hour = getModbusTimeValue(source.b[1]);
+  result.Data[j].Minute = getModbusTimeValue(source.b[0]);
+  result.Data[j].TariffIndex = getModbusTimeValue(source.b[3]);
+  j = 1;
+  result.Data[j].Hour = getModbusTimeValue(source.b[2]);
+  result.Data[j].Minute = getModbusTimeValue(source.b[5]);
+  result.Data[j].TariffIndex = getModbusTimeValue(source.b[4]);
+  j = 2;
+  result.Data[j].Hour = getModbusTimeValue(source.b[7]);
+  result.Data[j].Minute = getModbusTimeValue(source.b[6]);
+  result.Data[j].TariffIndex = getModbusTimeValue(source.b[9]);
+  j = 3;
+  result.Data[j].Hour = getModbusTimeValue(source.b[8]);
+  result.Data[j].Minute = getModbusTimeValue(source.b[11]);
+  result.Data[j].TariffIndex = getModbusTimeValue(source.b[10]);
+  j = 4;
+  result.Data[j].Hour = getModbusTimeValue(source.b[13]);
+  result.Data[j].Minute = getModbusTimeValue(source.b[12]);
+  result.Data[j].TariffIndex = getModbusTimeValue(source.b[15]);
+  j = 5;
+  result.Data[j].Hour = getModbusTimeValue(source.b[14]);
+  result.Data[j].Minute = getModbusTimeValue(source.b[17]);
+  result.Data[j].TariffIndex = getModbusTimeValue(source.b[16]);
+  j = 6;
+  result.Data[j].Hour = getModbusTimeValue(source.b[19]);
+  result.Data[j].Minute = getModbusTimeValue(source.b[18]);
+  result.Data[j].TariffIndex = getModbusTimeValue(source.b[21]);
+  j = 7;
+  result.Data[j].Hour = getModbusTimeValue(source.b[20]);
+  result.Data[j].Minute = getModbusTimeValue(source.b[23]);
+  result.Data[j].TariffIndex = getModbusTimeValue(source.b[22]);
+
+  return result;
 }
 
 TariffConfig_t OR_WE_THREE_PHASE_TARIFF::getTimeInterval6()
 {
+  uint8_t j;
+  TariffConfig_t result;
+
+  union u_data
+  {
+    byte b[24];
+    uint16_t data[12];
+  } source;
+
+  _result = _node.readHoldingRegisters(RegisterTimeInterval6, 12);
+
+  // do something with data if read is successful
+  if (_result == _node.ku8MBSuccess)
+  {
+    for (j = 0; j < 12; j++)
+    {
+      source.data[j] = _node.getResponseBuffer(j);
+    }
+  }
+
+  j = 0;
+  result.Data[j].Hour = getModbusTimeValue(source.b[1]);
+  result.Data[j].Minute = getModbusTimeValue(source.b[0]);
+  result.Data[j].TariffIndex = getModbusTimeValue(source.b[3]);
+  j = 1;
+  result.Data[j].Hour = getModbusTimeValue(source.b[2]);
+  result.Data[j].Minute = getModbusTimeValue(source.b[5]);
+  result.Data[j].TariffIndex = getModbusTimeValue(source.b[4]);
+  j = 2;
+  result.Data[j].Hour = getModbusTimeValue(source.b[7]);
+  result.Data[j].Minute = getModbusTimeValue(source.b[6]);
+  result.Data[j].TariffIndex = getModbusTimeValue(source.b[9]);
+  j = 3;
+  result.Data[j].Hour = getModbusTimeValue(source.b[8]);
+  result.Data[j].Minute = getModbusTimeValue(source.b[11]);
+  result.Data[j].TariffIndex = getModbusTimeValue(source.b[10]);
+  j = 4;
+  result.Data[j].Hour = getModbusTimeValue(source.b[13]);
+  result.Data[j].Minute = getModbusTimeValue(source.b[12]);
+  result.Data[j].TariffIndex = getModbusTimeValue(source.b[15]);
+  j = 5;
+  result.Data[j].Hour = getModbusTimeValue(source.b[14]);
+  result.Data[j].Minute = getModbusTimeValue(source.b[17]);
+  result.Data[j].TariffIndex = getModbusTimeValue(source.b[16]);
+  j = 6;
+  result.Data[j].Hour = getModbusTimeValue(source.b[19]);
+  result.Data[j].Minute = getModbusTimeValue(source.b[18]);
+  result.Data[j].TariffIndex = getModbusTimeValue(source.b[21]);
+  j = 7;
+  result.Data[j].Hour = getModbusTimeValue(source.b[20]);
+  result.Data[j].Minute = getModbusTimeValue(source.b[23]);
+  result.Data[j].TariffIndex = getModbusTimeValue(source.b[22]);
+
+  return result;
 }
 
 TariffConfig_t OR_WE_THREE_PHASE_TARIFF::getTimeInterval7()
 {
+  uint8_t j;
+  TariffConfig_t result;
+
+  union u_data
+  {
+    byte b[24];
+    uint16_t data[12];
+  } source;
+
+  _result = _node.readHoldingRegisters(RegisterTimeInterval7, 12);
+
+  // do something with data if read is successful
+  if (_result == _node.ku8MBSuccess)
+  {
+    for (j = 0; j < 12; j++)
+    {
+      source.data[j] = _node.getResponseBuffer(j);
+    }
+  }
+
+  j = 0;
+  result.Data[j].Hour = getModbusTimeValue(source.b[1]);
+  result.Data[j].Minute = getModbusTimeValue(source.b[0]);
+  result.Data[j].TariffIndex = getModbusTimeValue(source.b[3]);
+  j = 1;
+  result.Data[j].Hour = getModbusTimeValue(source.b[2]);
+  result.Data[j].Minute = getModbusTimeValue(source.b[5]);
+  result.Data[j].TariffIndex = getModbusTimeValue(source.b[4]);
+  j = 2;
+  result.Data[j].Hour = getModbusTimeValue(source.b[7]);
+  result.Data[j].Minute = getModbusTimeValue(source.b[6]);
+  result.Data[j].TariffIndex = getModbusTimeValue(source.b[9]);
+  j = 3;
+  result.Data[j].Hour = getModbusTimeValue(source.b[8]);
+  result.Data[j].Minute = getModbusTimeValue(source.b[11]);
+  result.Data[j].TariffIndex = getModbusTimeValue(source.b[10]);
+  j = 4;
+  result.Data[j].Hour = getModbusTimeValue(source.b[13]);
+  result.Data[j].Minute = getModbusTimeValue(source.b[12]);
+  result.Data[j].TariffIndex = getModbusTimeValue(source.b[15]);
+  j = 5;
+  result.Data[j].Hour = getModbusTimeValue(source.b[14]);
+  result.Data[j].Minute = getModbusTimeValue(source.b[17]);
+  result.Data[j].TariffIndex = getModbusTimeValue(source.b[16]);
+  j = 6;
+  result.Data[j].Hour = getModbusTimeValue(source.b[19]);
+  result.Data[j].Minute = getModbusTimeValue(source.b[18]);
+  result.Data[j].TariffIndex = getModbusTimeValue(source.b[21]);
+  j = 7;
+  result.Data[j].Hour = getModbusTimeValue(source.b[20]);
+  result.Data[j].Minute = getModbusTimeValue(source.b[23]);
+  result.Data[j].TariffIndex = getModbusTimeValue(source.b[22]);
+
+  return result;
 }
 
 TariffConfig_t OR_WE_THREE_PHASE_TARIFF::getTimeInterval8()
 {
+  uint8_t j;
+  TariffConfig_t result;
+
+  union u_data
+  {
+    byte b[24];
+    uint16_t data[12];
+  } source;
+
+  _result = _node.readHoldingRegisters(RegisterTimeInterval8, 12);
+
+  // do something with data if read is successful
+  if (_result == _node.ku8MBSuccess)
+  {
+    for (j = 0; j < 12; j++)
+    {
+      source.data[j] = _node.getResponseBuffer(j);
+    }
+  }
+
+  j = 0;
+  result.Data[j].Hour = getModbusTimeValue(source.b[1]);
+  result.Data[j].Minute = getModbusTimeValue(source.b[0]);
+  result.Data[j].TariffIndex = getModbusTimeValue(source.b[3]);
+  j = 1;
+  result.Data[j].Hour = getModbusTimeValue(source.b[2]);
+  result.Data[j].Minute = getModbusTimeValue(source.b[5]);
+  result.Data[j].TariffIndex = getModbusTimeValue(source.b[4]);
+  j = 2;
+  result.Data[j].Hour = getModbusTimeValue(source.b[7]);
+  result.Data[j].Minute = getModbusTimeValue(source.b[6]);
+  result.Data[j].TariffIndex = getModbusTimeValue(source.b[9]);
+  j = 3;
+  result.Data[j].Hour = getModbusTimeValue(source.b[8]);
+  result.Data[j].Minute = getModbusTimeValue(source.b[11]);
+  result.Data[j].TariffIndex = getModbusTimeValue(source.b[10]);
+  j = 4;
+  result.Data[j].Hour = getModbusTimeValue(source.b[13]);
+  result.Data[j].Minute = getModbusTimeValue(source.b[12]);
+  result.Data[j].TariffIndex = getModbusTimeValue(source.b[15]);
+  j = 5;
+  result.Data[j].Hour = getModbusTimeValue(source.b[14]);
+  result.Data[j].Minute = getModbusTimeValue(source.b[17]);
+  result.Data[j].TariffIndex = getModbusTimeValue(source.b[16]);
+  j = 6;
+  result.Data[j].Hour = getModbusTimeValue(source.b[19]);
+  result.Data[j].Minute = getModbusTimeValue(source.b[18]);
+  result.Data[j].TariffIndex = getModbusTimeValue(source.b[21]);
+  j = 7;
+  result.Data[j].Hour = getModbusTimeValue(source.b[20]);
+  result.Data[j].Minute = getModbusTimeValue(source.b[23]);
+  result.Data[j].TariffIndex = getModbusTimeValue(source.b[22]);
+
+  return result;
 }
 
-TariffConfig_t OR_WE_THREE_PHASE_TARIFF::getTimeZone()
+TimeZoneConfig_t OR_WE_THREE_PHASE_TARIFF::getTimeZone()
 {
+  uint8_t j;
+  TimeZoneConfig_t result;
+
+  union u_data
+  {
+    byte b[24];
+    uint16_t data[12];
+  } source;
+
+  _result = _node.readHoldingRegisters(RegisterTimeZone, 12);
+
+  // do something with data if read is successful
+  if (_result == _node.ku8MBSuccess)
+  {
+    for (j = 0; j < 12; j++)
+    {
+      source.data[j] = _node.getResponseBuffer(j);
+    }
+  }
+
+  j = 0;
+  result.Data[j].Day = getModbusTimeValue(source.b[1]);
+  result.Data[j].Month = getModbusTimeValue(source.b[0]);
+  result.Data[j].TimeIntervall = getModbusTimeValue(source.b[3]);
+  j = 1;
+  result.Data[j].Day = getModbusTimeValue(source.b[2]);
+  result.Data[j].Month = getModbusTimeValue(source.b[5]);
+  result.Data[j].TimeIntervall = getModbusTimeValue(source.b[4]);
+  j = 2;
+  result.Data[j].Day = getModbusTimeValue(source.b[7]);
+  result.Data[j].Month = getModbusTimeValue(source.b[6]);
+  result.Data[j].TimeIntervall = getModbusTimeValue(source.b[9]);
+  j = 3;
+  result.Data[j].Day = getModbusTimeValue(source.b[8]);
+  result.Data[j].Month = getModbusTimeValue(source.b[11]);
+  result.Data[j].TimeIntervall = getModbusTimeValue(source.b[10]);
+  j = 4;
+  result.Data[j].Day = getModbusTimeValue(source.b[13]);
+  result.Data[j].Month = getModbusTimeValue(source.b[12]);
+  result.Data[j].TimeIntervall = getModbusTimeValue(source.b[15]);
+  j = 5;
+  result.Data[j].Day = getModbusTimeValue(source.b[14]);
+  result.Data[j].Month = getModbusTimeValue(source.b[17]);
+  result.Data[j].TimeIntervall = getModbusTimeValue(source.b[16]);
+  j = 6;
+  result.Data[j].Day = getModbusTimeValue(source.b[19]);
+  result.Data[j].Month = getModbusTimeValue(source.b[18]);
+  result.Data[j].TimeIntervall = getModbusTimeValue(source.b[21]);
+  j = 7;
+  result.Data[j].Day = getModbusTimeValue(source.b[20]);
+  result.Data[j].Month = getModbusTimeValue(source.b[23]);
+  result.Data[j].TimeIntervall = getModbusTimeValue(source.b[22]);
+
+  return result;
 }
 
-void OR_WE_THREE_PHASE_TARIFF::setHolidayWeekendTariff(HolidayConfig_t value)
+void OR_WE_THREE_PHASE_TARIFF::setHolidayWeekendTariff(HolidayWeekendConfig_t value)
 {
+  _node.setTransmitBuffer(0, setModbusHolidayWeekend(value));
+
+  _result = _node.writeMultipleRegisters(RegisterHolidayWeekendTariff, 1);
 }
 
 void OR_WE_THREE_PHASE_TARIFF::setTimeInterval1(TariffConfig_t value)
 {
+  uint8_t j;
+
+  union u_data
+  {
+    byte b[24];
+    uint16_t data[12];
+  } source;
+
+  j = 0;
+  source.b[1] = setModbusTimeValue(value.Data[j].Hour);
+  source.b[0] = setModbusTimeValue(value.Data[j].Minute);
+  source.b[3] = getModbusTimeValue(value.Data[j].TariffIndex);
+  j = 1;
+  source.b[2] = setModbusTimeValue(value.Data[j].Hour);
+  source.b[5] = setModbusTimeValue(value.Data[j].Minute);
+  source.b[4] = getModbusTimeValue(value.Data[j].TariffIndex);
+  j = 2;
+  source.b[7] = setModbusTimeValue(value.Data[j].Hour);
+  source.b[6] = setModbusTimeValue(value.Data[j].Minute);
+  source.b[9] = getModbusTimeValue(value.Data[j].TariffIndex);
+  j = 3;
+  source.b[8] = setModbusTimeValue(value.Data[j].Hour);
+  source.b[11] = setModbusTimeValue(value.Data[j].Minute);
+  source.b[10] = getModbusTimeValue(value.Data[j].TariffIndex);
+  j = 4;
+  source.b[13] = setModbusTimeValue(value.Data[j].Hour);
+  source.b[12] = setModbusTimeValue(value.Data[j].Minute);
+  source.b[15] = getModbusTimeValue(value.Data[j].TariffIndex);
+  j = 5;
+  source.b[14] = setModbusTimeValue(value.Data[j].Hour);
+  source.b[17] = setModbusTimeValue(value.Data[j].Minute);
+  source.b[16] = getModbusTimeValue(value.Data[j].TariffIndex);
+  j = 6;
+  source.b[19] = setModbusTimeValue(value.Data[j].Hour);
+  source.b[18] = setModbusTimeValue(value.Data[j].Minute);
+  source.b[21] = getModbusTimeValue(value.Data[j].TariffIndex);
+  j = 7;
+  source.b[20] = setModbusTimeValue(value.Data[j].Hour);
+  source.b[23] = setModbusTimeValue(value.Data[j].Minute);
+  source.b[22] = getModbusTimeValue(value.Data[j].TariffIndex);
+
+  for (j = 0; j < 12; j++)
+  {
+    _node.setTransmitBuffer(j, source.data[j]);
+  }
+  _result = _node.writeMultipleRegisters(RegisterTimeInterval1, 12);
 }
 
 void OR_WE_THREE_PHASE_TARIFF::setTimeInterval2(TariffConfig_t value)
 {
+  uint8_t j;
+
+  union u_data
+  {
+    byte b[24];
+    uint16_t data[12];
+  } source;
+
+  j = 0;
+  source.b[1] = setModbusTimeValue(value.Data[j].Hour);
+  source.b[0] = setModbusTimeValue(value.Data[j].Minute);
+  source.b[3] = getModbusTimeValue(value.Data[j].TariffIndex);
+  j = 1;
+  source.b[2] = setModbusTimeValue(value.Data[j].Hour);
+  source.b[5] = setModbusTimeValue(value.Data[j].Minute);
+  source.b[4] = getModbusTimeValue(value.Data[j].TariffIndex);
+  j = 2;
+  source.b[7] = setModbusTimeValue(value.Data[j].Hour);
+  source.b[6] = setModbusTimeValue(value.Data[j].Minute);
+  source.b[9] = getModbusTimeValue(value.Data[j].TariffIndex);
+  j = 3;
+  source.b[8] = setModbusTimeValue(value.Data[j].Hour);
+  source.b[11] = setModbusTimeValue(value.Data[j].Minute);
+  source.b[10] = getModbusTimeValue(value.Data[j].TariffIndex);
+  j = 4;
+  source.b[13] = setModbusTimeValue(value.Data[j].Hour);
+  source.b[12] = setModbusTimeValue(value.Data[j].Minute);
+  source.b[15] = getModbusTimeValue(value.Data[j].TariffIndex);
+  j = 5;
+  source.b[14] = setModbusTimeValue(value.Data[j].Hour);
+  source.b[17] = setModbusTimeValue(value.Data[j].Minute);
+  source.b[16] = getModbusTimeValue(value.Data[j].TariffIndex);
+  j = 6;
+  source.b[19] = setModbusTimeValue(value.Data[j].Hour);
+  source.b[18] = setModbusTimeValue(value.Data[j].Minute);
+  source.b[21] = getModbusTimeValue(value.Data[j].TariffIndex);
+  j = 7;
+  source.b[20] = setModbusTimeValue(value.Data[j].Hour);
+  source.b[23] = setModbusTimeValue(value.Data[j].Minute);
+  source.b[22] = getModbusTimeValue(value.Data[j].TariffIndex);
+
+  for (j = 0; j < 12; j++)
+  {
+    _node.setTransmitBuffer(j, source.data[j]);
+  }
+  _result = _node.writeMultipleRegisters(RegisterTimeInterval2, 12);
 }
 
 void OR_WE_THREE_PHASE_TARIFF::setTimeInterval3(TariffConfig_t value)
 {
+  uint8_t j;
+
+  union u_data
+  {
+    byte b[24];
+    uint16_t data[12];
+  } source;
+
+  j = 0;
+  source.b[1] = setModbusTimeValue(value.Data[j].Hour);
+  source.b[0] = setModbusTimeValue(value.Data[j].Minute);
+  source.b[3] = getModbusTimeValue(value.Data[j].TariffIndex);
+  j = 1;
+  source.b[2] = setModbusTimeValue(value.Data[j].Hour);
+  source.b[5] = setModbusTimeValue(value.Data[j].Minute);
+  source.b[4] = getModbusTimeValue(value.Data[j].TariffIndex);
+  j = 2;
+  source.b[7] = setModbusTimeValue(value.Data[j].Hour);
+  source.b[6] = setModbusTimeValue(value.Data[j].Minute);
+  source.b[9] = getModbusTimeValue(value.Data[j].TariffIndex);
+  j = 3;
+  source.b[8] = setModbusTimeValue(value.Data[j].Hour);
+  source.b[11] = setModbusTimeValue(value.Data[j].Minute);
+  source.b[10] = getModbusTimeValue(value.Data[j].TariffIndex);
+  j = 4;
+  source.b[13] = setModbusTimeValue(value.Data[j].Hour);
+  source.b[12] = setModbusTimeValue(value.Data[j].Minute);
+  source.b[15] = getModbusTimeValue(value.Data[j].TariffIndex);
+  j = 5;
+  source.b[14] = setModbusTimeValue(value.Data[j].Hour);
+  source.b[17] = setModbusTimeValue(value.Data[j].Minute);
+  source.b[16] = getModbusTimeValue(value.Data[j].TariffIndex);
+  j = 6;
+  source.b[19] = setModbusTimeValue(value.Data[j].Hour);
+  source.b[18] = setModbusTimeValue(value.Data[j].Minute);
+  source.b[21] = getModbusTimeValue(value.Data[j].TariffIndex);
+  j = 7;
+  source.b[20] = setModbusTimeValue(value.Data[j].Hour);
+  source.b[23] = setModbusTimeValue(value.Data[j].Minute);
+  source.b[22] = getModbusTimeValue(value.Data[j].TariffIndex);
+
+  for (j = 0; j < 12; j++)
+  {
+    _node.setTransmitBuffer(j, source.data[j]);
+  }
+  _result = _node.writeMultipleRegisters(RegisterTimeInterval3, 12);
 }
 
 void OR_WE_THREE_PHASE_TARIFF::setTimeInterval4(TariffConfig_t value)
 {
+  uint8_t j;
+
+  union u_data
+  {
+    byte b[24];
+    uint16_t data[12];
+  } source;
+
+  j = 0;
+  source.b[1] = setModbusTimeValue(value.Data[j].Hour);
+  source.b[0] = setModbusTimeValue(value.Data[j].Minute);
+  source.b[3] = getModbusTimeValue(value.Data[j].TariffIndex);
+  j = 1;
+  source.b[2] = setModbusTimeValue(value.Data[j].Hour);
+  source.b[5] = setModbusTimeValue(value.Data[j].Minute);
+  source.b[4] = getModbusTimeValue(value.Data[j].TariffIndex);
+  j = 2;
+  source.b[7] = setModbusTimeValue(value.Data[j].Hour);
+  source.b[6] = setModbusTimeValue(value.Data[j].Minute);
+  source.b[9] = getModbusTimeValue(value.Data[j].TariffIndex);
+  j = 3;
+  source.b[8] = setModbusTimeValue(value.Data[j].Hour);
+  source.b[11] = setModbusTimeValue(value.Data[j].Minute);
+  source.b[10] = getModbusTimeValue(value.Data[j].TariffIndex);
+  j = 4;
+  source.b[13] = setModbusTimeValue(value.Data[j].Hour);
+  source.b[12] = setModbusTimeValue(value.Data[j].Minute);
+  source.b[15] = getModbusTimeValue(value.Data[j].TariffIndex);
+  j = 5;
+  source.b[14] = setModbusTimeValue(value.Data[j].Hour);
+  source.b[17] = setModbusTimeValue(value.Data[j].Minute);
+  source.b[16] = getModbusTimeValue(value.Data[j].TariffIndex);
+  j = 6;
+  source.b[19] = setModbusTimeValue(value.Data[j].Hour);
+  source.b[18] = setModbusTimeValue(value.Data[j].Minute);
+  source.b[21] = getModbusTimeValue(value.Data[j].TariffIndex);
+  j = 7;
+  source.b[20] = setModbusTimeValue(value.Data[j].Hour);
+  source.b[23] = setModbusTimeValue(value.Data[j].Minute);
+  source.b[22] = getModbusTimeValue(value.Data[j].TariffIndex);
+
+  for (j = 0; j < 12; j++)
+  {
+    _node.setTransmitBuffer(j, source.data[j]);
+  }
+  _result = _node.writeMultipleRegisters(RegisterTimeInterval4, 12);
 }
 
 void OR_WE_THREE_PHASE_TARIFF::setTimeInterval5(TariffConfig_t value)
 {
+  uint8_t j;
+
+  union u_data
+  {
+    byte b[24];
+    uint16_t data[12];
+  } source;
+
+  j = 0;
+  source.b[1] = setModbusTimeValue(value.Data[j].Hour);
+  source.b[0] = setModbusTimeValue(value.Data[j].Minute);
+  source.b[3] = getModbusTimeValue(value.Data[j].TariffIndex);
+  j = 1;
+  source.b[2] = setModbusTimeValue(value.Data[j].Hour);
+  source.b[5] = setModbusTimeValue(value.Data[j].Minute);
+  source.b[4] = getModbusTimeValue(value.Data[j].TariffIndex);
+  j = 2;
+  source.b[7] = setModbusTimeValue(value.Data[j].Hour);
+  source.b[6] = setModbusTimeValue(value.Data[j].Minute);
+  source.b[9] = getModbusTimeValue(value.Data[j].TariffIndex);
+  j = 3;
+  source.b[8] = setModbusTimeValue(value.Data[j].Hour);
+  source.b[11] = setModbusTimeValue(value.Data[j].Minute);
+  source.b[10] = getModbusTimeValue(value.Data[j].TariffIndex);
+  j = 4;
+  source.b[13] = setModbusTimeValue(value.Data[j].Hour);
+  source.b[12] = setModbusTimeValue(value.Data[j].Minute);
+  source.b[15] = getModbusTimeValue(value.Data[j].TariffIndex);
+  j = 5;
+  source.b[14] = setModbusTimeValue(value.Data[j].Hour);
+  source.b[17] = setModbusTimeValue(value.Data[j].Minute);
+  source.b[16] = getModbusTimeValue(value.Data[j].TariffIndex);
+  j = 6;
+  source.b[19] = setModbusTimeValue(value.Data[j].Hour);
+  source.b[18] = setModbusTimeValue(value.Data[j].Minute);
+  source.b[21] = getModbusTimeValue(value.Data[j].TariffIndex);
+  j = 7;
+  source.b[20] = setModbusTimeValue(value.Data[j].Hour);
+  source.b[23] = setModbusTimeValue(value.Data[j].Minute);
+  source.b[22] = getModbusTimeValue(value.Data[j].TariffIndex);
+
+  for (j = 0; j < 12; j++)
+  {
+    _node.setTransmitBuffer(j, source.data[j]);
+  }
+  _result = _node.writeMultipleRegisters(RegisterTimeInterval5, 12);
 }
 
 void OR_WE_THREE_PHASE_TARIFF::setTimeInterval6(TariffConfig_t value)
 {
+  uint8_t j;
+
+  union u_data
+  {
+    byte b[24];
+    uint16_t data[12];
+  } source;
+
+  j = 0;
+  source.b[1] = setModbusTimeValue(value.Data[j].Hour);
+  source.b[0] = setModbusTimeValue(value.Data[j].Minute);
+  source.b[3] = getModbusTimeValue(value.Data[j].TariffIndex);
+  j = 1;
+  source.b[2] = setModbusTimeValue(value.Data[j].Hour);
+  source.b[5] = setModbusTimeValue(value.Data[j].Minute);
+  source.b[4] = getModbusTimeValue(value.Data[j].TariffIndex);
+  j = 2;
+  source.b[7] = setModbusTimeValue(value.Data[j].Hour);
+  source.b[6] = setModbusTimeValue(value.Data[j].Minute);
+  source.b[9] = getModbusTimeValue(value.Data[j].TariffIndex);
+  j = 3;
+  source.b[8] = setModbusTimeValue(value.Data[j].Hour);
+  source.b[11] = setModbusTimeValue(value.Data[j].Minute);
+  source.b[10] = getModbusTimeValue(value.Data[j].TariffIndex);
+  j = 4;
+  source.b[13] = setModbusTimeValue(value.Data[j].Hour);
+  source.b[12] = setModbusTimeValue(value.Data[j].Minute);
+  source.b[15] = getModbusTimeValue(value.Data[j].TariffIndex);
+  j = 5;
+  source.b[14] = setModbusTimeValue(value.Data[j].Hour);
+  source.b[17] = setModbusTimeValue(value.Data[j].Minute);
+  source.b[16] = getModbusTimeValue(value.Data[j].TariffIndex);
+  j = 6;
+  source.b[19] = setModbusTimeValue(value.Data[j].Hour);
+  source.b[18] = setModbusTimeValue(value.Data[j].Minute);
+  source.b[21] = getModbusTimeValue(value.Data[j].TariffIndex);
+  j = 7;
+  source.b[20] = setModbusTimeValue(value.Data[j].Hour);
+  source.b[23] = setModbusTimeValue(value.Data[j].Minute);
+  source.b[22] = getModbusTimeValue(value.Data[j].TariffIndex);
+
+  for (j = 0; j < 12; j++)
+  {
+    _node.setTransmitBuffer(j, source.data[j]);
+  }
+  _result = _node.writeMultipleRegisters(RegisterTimeInterval6, 12);
 }
 
 void OR_WE_THREE_PHASE_TARIFF::setTimeInterval7(TariffConfig_t value)
 {
+  uint8_t j;
+
+  union u_data
+  {
+    byte b[24];
+    uint16_t data[12];
+  } source;
+
+  j = 0;
+  source.b[1] = setModbusTimeValue(value.Data[j].Hour);
+  source.b[0] = setModbusTimeValue(value.Data[j].Minute);
+  source.b[3] = getModbusTimeValue(value.Data[j].TariffIndex);
+  j = 1;
+  source.b[2] = setModbusTimeValue(value.Data[j].Hour);
+  source.b[5] = setModbusTimeValue(value.Data[j].Minute);
+  source.b[4] = getModbusTimeValue(value.Data[j].TariffIndex);
+  j = 2;
+  source.b[7] = setModbusTimeValue(value.Data[j].Hour);
+  source.b[6] = setModbusTimeValue(value.Data[j].Minute);
+  source.b[9] = getModbusTimeValue(value.Data[j].TariffIndex);
+  j = 3;
+  source.b[8] = setModbusTimeValue(value.Data[j].Hour);
+  source.b[11] = setModbusTimeValue(value.Data[j].Minute);
+  source.b[10] = getModbusTimeValue(value.Data[j].TariffIndex);
+  j = 4;
+  source.b[13] = setModbusTimeValue(value.Data[j].Hour);
+  source.b[12] = setModbusTimeValue(value.Data[j].Minute);
+  source.b[15] = getModbusTimeValue(value.Data[j].TariffIndex);
+  j = 5;
+  source.b[14] = setModbusTimeValue(value.Data[j].Hour);
+  source.b[17] = setModbusTimeValue(value.Data[j].Minute);
+  source.b[16] = getModbusTimeValue(value.Data[j].TariffIndex);
+  j = 6;
+  source.b[19] = setModbusTimeValue(value.Data[j].Hour);
+  source.b[18] = setModbusTimeValue(value.Data[j].Minute);
+  source.b[21] = getModbusTimeValue(value.Data[j].TariffIndex);
+  j = 7;
+  source.b[20] = setModbusTimeValue(value.Data[j].Hour);
+  source.b[23] = setModbusTimeValue(value.Data[j].Minute);
+  source.b[22] = getModbusTimeValue(value.Data[j].TariffIndex);
+
+  for (j = 0; j < 12; j++)
+  {
+    _node.setTransmitBuffer(j, source.data[j]);
+  }
+  _result = _node.writeMultipleRegisters(RegisterTimeInterval7, 12);
 }
 
 void OR_WE_THREE_PHASE_TARIFF::setTimeInterval8(TariffConfig_t value)
 {
+  uint8_t j;
+
+  union u_data
+  {
+    byte b[24];
+    uint16_t data[12];
+  } source;
+
+  j = 0;
+  source.b[1] = setModbusTimeValue(value.Data[j].Hour);
+  source.b[0] = setModbusTimeValue(value.Data[j].Minute);
+  source.b[3] = getModbusTimeValue(value.Data[j].TariffIndex);
+  j = 1;
+  source.b[2] = setModbusTimeValue(value.Data[j].Hour);
+  source.b[5] = setModbusTimeValue(value.Data[j].Minute);
+  source.b[4] = getModbusTimeValue(value.Data[j].TariffIndex);
+  j = 2;
+  source.b[7] = setModbusTimeValue(value.Data[j].Hour);
+  source.b[6] = setModbusTimeValue(value.Data[j].Minute);
+  source.b[9] = getModbusTimeValue(value.Data[j].TariffIndex);
+  j = 3;
+  source.b[8] = setModbusTimeValue(value.Data[j].Hour);
+  source.b[11] = setModbusTimeValue(value.Data[j].Minute);
+  source.b[10] = getModbusTimeValue(value.Data[j].TariffIndex);
+  j = 4;
+  source.b[13] = setModbusTimeValue(value.Data[j].Hour);
+  source.b[12] = setModbusTimeValue(value.Data[j].Minute);
+  source.b[15] = getModbusTimeValue(value.Data[j].TariffIndex);
+  j = 5;
+  source.b[14] = setModbusTimeValue(value.Data[j].Hour);
+  source.b[17] = setModbusTimeValue(value.Data[j].Minute);
+  source.b[16] = getModbusTimeValue(value.Data[j].TariffIndex);
+  j = 6;
+  source.b[19] = setModbusTimeValue(value.Data[j].Hour);
+  source.b[18] = setModbusTimeValue(value.Data[j].Minute);
+  source.b[21] = getModbusTimeValue(value.Data[j].TariffIndex);
+  j = 7;
+  source.b[20] = setModbusTimeValue(value.Data[j].Hour);
+  source.b[23] = setModbusTimeValue(value.Data[j].Minute);
+  source.b[22] = getModbusTimeValue(value.Data[j].TariffIndex);
+
+  for (j = 0; j < 12; j++)
+  {
+    _node.setTransmitBuffer(j, source.data[j]);
+  }
+  _result = _node.writeMultipleRegisters(RegisterTimeInterval8, 12);
 }
 
-void OR_WE_THREE_PHASE_TARIFF::setTimeZone(TariffConfig_t value) 
+void OR_WE_THREE_PHASE_TARIFF::setTimeZone(TimeZoneConfig_t value)
 {
-  
+   uint8_t j;
+
+  union u_data
+  {
+    byte b[24];
+    uint16_t data[12];
+  } source;
+
+  j = 0;
+  source.b[1] = setModbusTimeValue(value.Data[j].Month);
+  source.b[0] = setModbusTimeValue(value.Data[j].Day);
+  source.b[3] = getModbusTimeValue(value.Data[j].TimeIntervall);
+  j = 1;
+  source.b[2] = setModbusTimeValue(value.Data[j].Month);
+  source.b[5] = setModbusTimeValue(value.Data[j].Day);
+  source.b[4] = getModbusTimeValue(value.Data[j].TimeIntervall);
+  j = 2;
+  source.b[7] = setModbusTimeValue(value.Data[j].Month);
+  source.b[6] = setModbusTimeValue(value.Data[j].Day);
+  source.b[9] = getModbusTimeValue(value.Data[j].TimeIntervall);
+  j = 3;
+  source.b[8] = setModbusTimeValue(value.Data[j].Month);
+  source.b[11] = setModbusTimeValue(value.Data[j].Day);
+  source.b[10] = getModbusTimeValue(value.Data[j].TimeIntervall);
+  j = 4;
+  source.b[13] = setModbusTimeValue(value.Data[j].Month);
+  source.b[12] = setModbusTimeValue(value.Data[j].Day);
+  source.b[15] = getModbusTimeValue(value.Data[j].TimeIntervall);
+  j = 5;
+  source.b[14] = setModbusTimeValue(value.Data[j].Month);
+  source.b[17] = setModbusTimeValue(value.Data[j].Day);
+  source.b[16] = getModbusTimeValue(value.Data[j].TimeIntervall);
+  j = 6;
+  source.b[19] = setModbusTimeValue(value.Data[j].Month);
+  source.b[18] = setModbusTimeValue(value.Data[j].Day);
+  source.b[21] = getModbusTimeValue(value.Data[j].TimeIntervall);
+  j = 7;
+  source.b[20] = setModbusTimeValue(value.Data[j].Month);
+  source.b[23] = setModbusTimeValue(value.Data[j].Day);
+  source.b[22] = getModbusTimeValue(value.Data[j].TimeIntervall);
+
+  for (j = 0; j < 12; j++)
+  {
+    _node.setTransmitBuffer(j, source.data[j]);
+  }
+  _result = _node.writeMultipleRegisters(RegisterTimeZone, 12);
 }
 
 //------------------------------------------------------------------------------
 OR_WE_SINGLE_PHASE::OR_WE_SINGLE_PHASE(void)
 {
+}
+
+tm OR_WE_SINGLE_PHASE::getModbusTime(uint16_t data[4])
+{
+  union u_data
+  {
+    byte b[8];
+    uint16_t data[4];
+  } source;
+
+  tm dest;
+
+  source.data[0] = data[0];
+  source.data[1] = data[1];
+  source.data[2] = data[2];
+  source.data[3] = data[3];
+
+  dest.tm_mon = source.b[1];
+  dest.tm_mday = source.b[0];
+  dest.tm_year = source.b[3];
+  dest.tm_hour = source.b[2];
+  dest.tm_min = source.b[5];
+  dest.tm_sec = source.b[4];
+  dest.tm_wday = source.b[7];
+
+  return dest;
+}
+
+uint16Array_t OR_WE_SINGLE_PHASE::setModbusTime(tm value)
+{
+  union u_data
+  {
+    byte b[8];
+    uint16_t data[4];
+  } source;
+
+  uint16Array_t dest;
+
+  source.b[1] = value.tm_mon;
+  source.b[0] = value.tm_mday;
+  source.b[3] = value.tm_year;
+  source.b[2] = value.tm_hour;
+  source.b[5] = value.tm_min;
+  source.b[4] = value.tm_sec;
+  source.b[7] = value.tm_wday;
+  source.b[6] = value.tm_wday;
+
+  dest.value[0] = source.data[0];
+  dest.value[1] = source.data[1];
+  dest.value[2] = source.data[2];
+  dest.value[3] = source.data[3];
+
+  return dest;
 }
 
 //Voltage
@@ -2265,6 +3314,13 @@ void OR_WE_SINGLE_PHASE::setBusBaud(BaudConfig_t value)
   _node.setTransmitBuffer(0, setModbusBaud(value));
 
   _result = _node.writeMultipleRegisters(RegisterBusBaud, 1);
+}
+
+void OR_WE_SINGLE_PHASE::setMeterId(uint16_t value)
+{
+  _node.setTransmitBuffer(0, value);
+
+  _result = _node.writeMultipleRegisters(RegisterMeterId, 1);
 }
 
 // uint16_t OR_WE_SINGLE_PHASE::getLcdState()

@@ -22,7 +22,6 @@ struct TotalCounterTariff_t
   float T4;
 };
 
-//------------------------------------------------------------------------------
 struct TariffConfigData_t
 {
   uint8_t Hour;
@@ -35,7 +34,6 @@ struct TariffConfig_t
   TariffConfigData_t Data[8];
 };
 
-//------------------------------------------------------------------------------
 struct HolidayConfigData_t
 {
   uint8_t Day;
@@ -58,6 +56,24 @@ struct uint16Array_t
   uint16_t value[4];
 };
 
+struct TimeZoneConfigData_t
+{
+  uint8_t Day;
+  uint8_t Month;
+  uint8_t TimeIntervall;
+};
+
+struct TimeZoneConfig_t
+{
+  TimeZoneConfigData_t Data[8];
+};
+
+struct HolidayWeekendConfig_t
+{
+  uint8_t Holiday;
+  uint8_t Weekend;
+};
+
 //------------------------------------------------------------------------------
 class OR_WE
 {
@@ -76,14 +92,14 @@ protected:
 
   float getModbusFloat(uint16_t data[2]);
   uint32_t getModbusUint32(uint16_t data[2]);
-  tm getModbusTime(uint16_t data[4]);
-  uint16Array_t setModbusTime(tm vale);
   TariffConfigData_t getModbusTariffConfig(uint16_t data[2]);
   uint16Array_t setModbusTariffConfig(TariffConfigData_t value);
   HolidayConfigData_t getModbusHolidayConfig(uint16_t data);
   uint16_t setModbusHolidayConfig(HolidayConfigData_t value);
   BaudConfig_t getModbusBaud(uint16_t data);
   uint16_t setModbusBaud(BaudConfig_t value);
+  TimeZoneConfigData_t getModbusTimeZoneConfig(uint16_t data[2]);
+  uint16Array_t setModbusTimeZoneConfig(TimeZoneConfigData_t value);
 };
 
 class OR_WE_SINGLE_PHASE : public OR_WE
@@ -121,9 +137,13 @@ public:
   BaudConfig_t getBusBaud();
   //uint16_t getLcdState(); // not supported yet
 
-  void setBusBaud(BaudConfig_t value);
+  void setBusBaud(BaudConfig_t value); // Todo
+  void setMeterId(uint16_t value);     // Todo
 
 protected:
+  tm getModbusTime(uint16_t data[4]);
+  uint16Array_t setModbusTime(tm value);
+
   //OR_WE registers
   //Voltages
   static const uint16_t RegisterVoltage = 0x0131;
@@ -231,81 +251,84 @@ public:
   float getTotalCounterActivePowerL1();
   float getTotalCounterActivePowerL2();
   float getTotalCounterActivePowerL3();
-  float getTotalCounterActivePowerT1(); // Todo
-  float getTotalCounterActivePowerT2(); // Todo
-  float getTotalCounterActivePowerT3(); // Todo
-  float getTotalCounterActivePowerT4(); // Todo
+  float getTotalCounterActivePowerT1();
+  float getTotalCounterActivePowerT2();
+  float getTotalCounterActivePowerT3();
+  float getTotalCounterActivePowerT4();
 
   float getTotalCounterReactivePowerTotal();
   float getTotalCounterReactivePowerL1();
   float getTotalCounterReactivePowerL2();
   float getTotalCounterReactivePowerL3();
-  float getTotalCounterReactivePowerT1(); // Todo
-  float getTotalCounterReactivePowerT2(); // Todo
-  float getTotalCounterReactivePowerT3(); // Todo
-  float getTotalCounterReactivePowerT4(); // Todo
+  float getTotalCounterReactivePowerT1();
+  float getTotalCounterReactivePowerT2();
+  float getTotalCounterReactivePowerT3();
+  float getTotalCounterReactivePowerT4();
 
   //Counter Import
   float getImportCounterActivePowerTotal();
   float getImportCounterActivePowerL1();
   float getImportCounterActivePowerL2();
   float getImportCounterActivePowerL3();
-  float getImportCounterActivePowerT1(); // Todo
-  float getImportCounterActivePowerT2(); // Todo
-  float getImportCounterActivePowerT3(); // Todo
-  float getImportCounterActivePowerT4(); // Todo
+  float getImportCounterActivePowerT1();
+  float getImportCounterActivePowerT2();
+  float getImportCounterActivePowerT3();
+  float getImportCounterActivePowerT4();
 
   float getImportCounterReactivePowerTotal();
   float getImportCounterReactivePowerL1();
   float getImportCounterReactivePowerL2();
   float getImportCounterReactivePowerL3();
-  float getImportCounterReactivePowerT1(); // Todo
-  float getImportCounterReactivePowerT2(); // Todo
-  float getImportCounterReactivePowerT3(); // Todo
-  float getImportCounterReactivePowerT4(); // Todo
+  float getImportCounterReactivePowerT1();
+  float getImportCounterReactivePowerT2();
+  float getImportCounterReactivePowerT3();
+  float getImportCounterReactivePowerT4();
 
   //Counter Export
   float getExportCounterActivePowerTotal();
   float getExportCounterActivePowerL1();
   float getExportCounterActivePowerL2();
   float getExportCounterActivePowerL3();
-  float getExportCounterActivePowerT1(); // Todo
-  float getExportCounterActivePowerT2(); // Todo
-  float getExportCounterActivePowerT3(); // Todo
-  float getExportCounterActivePowerT4(); // Todo
+  float getExportCounterActivePowerT1();
+  float getExportCounterActivePowerT2();
+  float getExportCounterActivePowerT3();
+  float getExportCounterActivePowerT4();
 
   float getExportCounterReactivePowerTotal();
   float getExportCounterReactivePowerL1();
   float getExportCounterReactivePowerL2();
   float getExportCounterReactivePowerL3();
-  float getExportCounterReactivePowerT1(); // Todo
-  float getExportCounterReactivePowerT2(); // Todo
-  float getExportCounterReactivePowerT3(); // Todo
-  float getExportCounterReactivePowerT4(); // Todo
+  float getExportCounterReactivePowerT1();
+  float getExportCounterReactivePowerT2();
+  float getExportCounterReactivePowerT3();
+  float getExportCounterReactivePowerT4();
 
   //Other
   uint32_t getSerialNo();
   uint16_t getMeterId();
-  BaudConfig_t getBusBaud();
+  uint16_t getBusBaud();
   float getSoftwareVersion();
   float getHardwareVersion();
-  uint16_t getCountRate();
   float getS0Rate();
-  uint16_t getA3();
-  uint16_t getCycleTime();
   uint16_t getCrc();
   uint16_t getCombinedCode();
-  uint16_t getLcdCycleTime(); // Todo
-  tm getDateTime();           // Todo
+  uint16_t getLcdCycleTime();
+  tm getDateTime();
 
-  void setMeterId(uint16_t value);      // Todo
-  void setBusBaud(BaudConfig_t value);  // Todo
-  void setS0Rate(float value);          // Todo
-  void setCombinedCode(uint16_t value); // Todo
-  void setLcdCycleTime(uint16_t value); // Todo
-  void setDateTime(tm value);           // Todo
+  void setMeterId(uint16_t value);     
+  void setBusBaud(uint16_t value);     
+  void setS0Rate(float value);         
+  void setCombinedCode(uint16_t value);
+  void setLcdCycleTime(uint16_t value);
+  void setDateTime(tm value);
 
 protected:
+  tm getModbusTime(uint16_t data[4]);
+  uint16Array_t setModbusTime(tm value);
+
+  uint16_t getModbusTimeValue(uint16_t value);
+  uint16_t setModbusTimeValue(uint16_t value);
+
   //OR_WE registers
   //Voltages
   static const uint16_t RegisterVoltageP1 = 0x000E;
@@ -349,19 +372,19 @@ protected:
   static const uint16_t RegisterTotalActivePowerP1 = 0x0102;
   static const uint16_t RegisterTotalActivePowerP2 = 0x0104;
   static const uint16_t RegisterTotalActivePowerP3 = 0x0106;
-  static const uint16_t RegisterTotalActivePowerSystemT1 = 0x0130; 
-  static const uint16_t RegisterTotalActivePowerSystemT2 = 0x013C; 
-  static const uint16_t RegisterTotalActivePowerSystemT3 = 0x0148; 
-  static const uint16_t RegisterTotalActivePowerSystemT4 = 0x0154; 
+  static const uint16_t RegisterTotalActivePowerSystemT1 = 0x0130;
+  static const uint16_t RegisterTotalActivePowerSystemT2 = 0x013C;
+  static const uint16_t RegisterTotalActivePowerSystemT3 = 0x0148;
+  static const uint16_t RegisterTotalActivePowerSystemT4 = 0x0154;
 
   static const uint16_t RegisterTotalReactivePowerSystem = 0x0118;
   static const uint16_t RegisterTotalReactivePowerP1 = 0x011A;
   static const uint16_t RegisterTotalReactivePowerP2 = 0x011C;
   static const uint16_t RegisterTotalReactivePowerP3 = 0x011E;
-  static const uint16_t RegisterTotalReactivePowerSystemT1 = 0x0136; 
-  static const uint16_t RegisterTotalReactivePowerSystemT2 = 0x0142; 
-  static const uint16_t RegisterTotalReactivePowerSystemT3 = 0x014E; 
-  static const uint16_t RegisterTotalReactivePowerSystemT4 = 0x015A; 
+  static const uint16_t RegisterTotalReactivePowerSystemT1 = 0x0136;
+  static const uint16_t RegisterTotalReactivePowerSystemT2 = 0x0142;
+  static const uint16_t RegisterTotalReactivePowerSystemT3 = 0x014E;
+  static const uint16_t RegisterTotalReactivePowerSystemT4 = 0x015A;
 
   //Counter Import
   static const uint16_t RegisterImportActivePowerSystem = 0x0108;
@@ -407,14 +430,11 @@ protected:
   static const uint16_t RegisterBusBaud = 0x0003;
   static const uint16_t RegisterSoftwareVersion = 0x0004;
   static const uint16_t RegisterHardwareVersion = 0x0006;
-  static const uint16_t RegisterCountRate = 0x0008;
   static const uint16_t RegisterS0Rate = 0x0009;
-  static const uint16_t RegisterA3 = 0x000B;
-  static const uint16_t RegisterCycleTime = 0x000D;
   static const uint16_t RegisterCrc = 0x0041;
-  static const uint16_t RegisterCombinedCode = 0x0042;
-  static const uint16_t RegisterDateTime = 0x003C;   
-  static const uint16_t RegisterLcdCycleTine = 0x000D;
+  static const uint16_t RegisterCombinedCode = 0x000B;
+  static const uint16_t RegisterDateTime = 0x003C;
+  static const uint16_t RegisterLcdCycleTime = 0x000D;
 };
 
 class OR_WE_THREE_PHASE_TARIFF : public OR_WE_THREE_PHASE
@@ -423,8 +443,7 @@ public:
   OR_WE_THREE_PHASE_TARIFF();
 
   //Other
-
-  HolidayConfig_t getHolidayWeekendTariff();
+  HolidayWeekendConfig_t getHolidayWeekendTariff();
   TariffConfig_t getTimeInterval1();
   TariffConfig_t getTimeInterval2();
   TariffConfig_t getTimeInterval3();
@@ -433,9 +452,9 @@ public:
   TariffConfig_t getTimeInterval6();
   TariffConfig_t getTimeInterval7();
   TariffConfig_t getTimeInterval8();
-  TariffConfig_t getTimeZone();
+  TimeZoneConfig_t getTimeZone();
 
-  void setHolidayWeekendTariff(HolidayConfig_t value);
+  void setHolidayWeekendTariff(HolidayWeekendConfig_t value);
   void setTimeInterval1(TariffConfig_t value);
   void setTimeInterval2(TariffConfig_t value);
   void setTimeInterval3(TariffConfig_t value);
@@ -444,9 +463,12 @@ public:
   void setTimeInterval6(TariffConfig_t value);
   void setTimeInterval7(TariffConfig_t value);
   void setTimeInterval8(TariffConfig_t value);
-  void setTimeZone(TariffConfig_t value);
+  void setTimeZone(TimeZoneConfig_t value);
 
 protected:
+  HolidayWeekendConfig_t getModbusHolidayWeekend(uint16_t data);
+  uint16_t setModbusHolidayWeekend(HolidayWeekendConfig_t value);
+
   //OR_WE registers
   //Other
   static const uint16_t RegisterHolidayWeekendTariff = 0x000C;
