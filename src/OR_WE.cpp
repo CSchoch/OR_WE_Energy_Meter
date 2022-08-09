@@ -7,17 +7,38 @@
 
 //------------------------------------------------------------------------------
 #include "OR_WE.h"
+#include <Arduino.h>
 #include "ModbusMaster.h"
 
 //------------------------------------------------------------------------------
-OR_WE::OR_WE(void)
+OR_WE::OR_WE(boolean manualDere, int8_t derePin)
 {
+    this->derePin = derePin;
+    this->manualDere = manualDere;
+ }
+
+
+void OR_WE::preTransmission(void)
+{
+    digitalWrite(this->derePin, 1);
+}
+void OR_WE::postTransmission(void)
+{
+    digitalWrite(this->derePin, 0);
 }
 
 void OR_WE::begin(Stream &serial, uint8_t slave)
 {
   _node.begin(slave, serial);
+
+  if(this->manualDere)
+  {
+    _node.postTransmission(postTransmission);
+    _node.preTransmission(std::bind(&OR_WE::preTransmission, this));
+  }
 }
+
+
 
 uint8_t OR_WE::getErrCode(bool _clear)
 {
@@ -265,7 +286,7 @@ uint16Array_t OR_WE::setModbusTimeZoneConfig(TimeZoneConfigData_t value)
 }
 
 //------------------------------------------------------------------------------
-OR_WE_THREE_PHASE::OR_WE_THREE_PHASE(void)
+OR_WE_THREE_PHASE::OR_WE_THREE_PHASE(boolean manualDere, int8_t derePin)
 {
 }
 
@@ -1965,7 +1986,7 @@ void OR_WE_THREE_PHASE::setMeterId(uint16_t value)
 }
 
 //------------------------------------------------------------------------------
-OR_WE_THREE_PHASE_TARIFF::OR_WE_THREE_PHASE_TARIFF()
+OR_WE_THREE_PHASE_TARIFF::OR_WE_THREE_PHASE_TARIFF(boolean manualDere, int8_t derePin)
 {
 }
 
@@ -2996,8 +3017,10 @@ void OR_WE_THREE_PHASE_TARIFF::setTimeZone(TimeZoneConfig_t value)
 }
 
 //------------------------------------------------------------------------------
-OR_WE_SINGLE_PHASE::OR_WE_SINGLE_PHASE(void)
+OR_WE_SINGLE_PHASE::OR_WE_SINGLE_PHASE(boolean manualDere, int8_t derePin)
 {
+  this->manualDere = manualDere;
+  this->derePin = derePin;
 }
 
 tm OR_WE_SINGLE_PHASE::getModbusTime(uint16_t data[4])
@@ -3338,7 +3361,7 @@ void OR_WE_SINGLE_PHASE::setMeterId(uint16_t value)
 // }
 
 //------------------------------------------------------------------------------
-OR_WE_SINGLE_PHASE_TARIFF::OR_WE_SINGLE_PHASE_TARIFF(void)
+OR_WE_SINGLE_PHASE_TARIFF::OR_WE_SINGLE_PHASE_TARIFF(boolean manualDere, int8_t derePin)
 {
 }
 

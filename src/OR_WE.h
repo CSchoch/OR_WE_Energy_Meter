@@ -79,7 +79,7 @@ struct HolidayWeekendConfig_t
 class OR_WE
 {
 public:
-  OR_WE();
+  OR_WE(boolean manualDere = false, int8_t derePin = -1);
 
   void begin(Stream &serial, uint8_t slave);
 
@@ -101,12 +101,18 @@ protected:
   uint16_t setModbusBaud(BaudConfig_t value);
   TimeZoneConfigData_t getModbusTimeZoneConfig(uint16_t data[2]);
   uint16Array_t setModbusTimeZoneConfig(TimeZoneConfigData_t value);
+
+  virtual void preTransmission(void);
+  virtual void postTransmission(void);
+
+  int8_t derePin;
+  boolean manualDere;
 };
 
 class OR_WE_SINGLE_PHASE : public OR_WE
 {
 public:
-  OR_WE_SINGLE_PHASE();
+  OR_WE_SINGLE_PHASE(boolean manualDere = false, int8_t derePin = -1);
 
   //Voltage
   float getVoltage();
@@ -180,7 +186,7 @@ protected:
 class OR_WE_SINGLE_PHASE_TARIFF : public OR_WE_SINGLE_PHASE
 {
 public:
-  OR_WE_SINGLE_PHASE_TARIFF();
+  OR_WE_SINGLE_PHASE_TARIFF(boolean manualDere = false, int8_t derePin = -1);
 
   //Other
   TariffConfig_t getWeekdayTariff();
@@ -208,7 +214,7 @@ protected:
 class OR_WE_THREE_PHASE : public OR_WE
 {
 public:
-  OR_WE_THREE_PHASE();
+  OR_WE_THREE_PHASE(boolean manualDere = false, int8_t derePin = -1);
 
   //Voltage
   float getVoltageL1();
@@ -441,7 +447,7 @@ protected:
 class OR_WE_THREE_PHASE_TARIFF : public OR_WE_THREE_PHASE
 {
 public:
-  OR_WE_THREE_PHASE_TARIFF();
+  OR_WE_THREE_PHASE_TARIFF(boolean manualDere = false, int8_t derePin = -1);
 
   //Other
   HolidayWeekendConfig_t getHolidayWeekendTariff();
@@ -483,4 +489,5 @@ protected:
   static const uint16_t RegisterTimeInterval8 = 0x0354;
   static const uint16_t RegisterTimeZone = 0x0360;
 };
+
 #endif //OR_WE_h
