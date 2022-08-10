@@ -20,11 +20,11 @@ OR_WE::OR_WE(boolean manualDere, int8_t derePin)
 
 void OR_WE::preTransmission(void)
 {
-    digitalWrite(this->derePin, 1);
+    digitalWrite(D6, 1);
 }
 void OR_WE::postTransmission(void)
 {
-    digitalWrite(this->derePin, 0);
+    digitalWrite(D6, 0);
 }
 
 void OR_WE::begin(Stream &serial, uint8_t slave)
@@ -33,7 +33,8 @@ void OR_WE::begin(Stream &serial, uint8_t slave)
 
   if(this->manualDere)
   {
-    _node.postTransmission(postTransmission);
+
+    _node.postTransmission([]() -> void { postTransmission();});
     _node.preTransmission(std::bind(&OR_WE::preTransmission, this));
   }
 }
