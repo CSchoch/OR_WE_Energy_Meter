@@ -86,6 +86,8 @@ public:
   uint8_t getErrCode(bool _clear = false); //return last errorcode (optional clear this value, default flase)
   void clearErrCode();                     //clear last errorcode
 
+  void preTransmission(void);
+  void postTransmission(void);
 protected:
   // instantiate ModbusMaster object
   ModbusMaster _node;
@@ -101,9 +103,6 @@ protected:
   uint16_t setModbusBaud(BaudConfig_t value);
   TimeZoneConfigData_t getModbusTimeZoneConfig(uint16_t data[2]);
   uint16Array_t setModbusTimeZoneConfig(TimeZoneConfigData_t value);
-
-  virtual void preTransmission(void);
-  virtual void postTransmission(void);
 
   int8_t derePin;
   boolean manualDere;
