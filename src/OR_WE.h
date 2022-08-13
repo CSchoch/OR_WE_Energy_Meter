@@ -12,6 +12,7 @@
 //------------------------------------------------------------------------------
 #define OR_WE_SERIAL_BAUD 9600
 #define OR_WE_SERIAL_MODE SERIAL_8E1
+#define derePin D6
 
 //------------------------------------------------------------------------------
 struct TotalCounterTariff_t
@@ -79,15 +80,14 @@ struct HolidayWeekendConfig_t
 class OR_WE
 {
 public:
-  OR_WE(boolean manualDere = false, int8_t derePin = -1);
+  OR_WE(boolean manualDere = false);
 
   void begin(Stream &serial, uint8_t slave);
 
   uint8_t getErrCode(bool _clear = false); //return last errorcode (optional clear this value, default flase)
   void clearErrCode();                     //clear last errorcode
+  boolean manualDere;
 
-  void preTransmission(void);
-  void postTransmission(void);
 protected:
   // instantiate ModbusMaster object
   ModbusMaster _node;
@@ -103,15 +103,12 @@ protected:
   uint16_t setModbusBaud(BaudConfig_t value);
   TimeZoneConfigData_t getModbusTimeZoneConfig(uint16_t data[2]);
   uint16Array_t setModbusTimeZoneConfig(TimeZoneConfigData_t value);
-
-  int8_t derePin;
-  boolean manualDere;
 };
 
 class OR_WE_SINGLE_PHASE : public OR_WE
 {
 public:
-  OR_WE_SINGLE_PHASE(boolean manualDere = false, int8_t derePin = -1);
+  OR_WE_SINGLE_PHASE(boolean manualDere = false);
 
   //Voltage
   float getVoltage();
@@ -185,7 +182,7 @@ protected:
 class OR_WE_SINGLE_PHASE_TARIFF : public OR_WE_SINGLE_PHASE
 {
 public:
-  OR_WE_SINGLE_PHASE_TARIFF(boolean manualDere = false, int8_t derePin = -1);
+  OR_WE_SINGLE_PHASE_TARIFF(boolean manualDere = false);
 
   //Other
   TariffConfig_t getWeekdayTariff();
@@ -213,7 +210,7 @@ protected:
 class OR_WE_THREE_PHASE : public OR_WE
 {
 public:
-  OR_WE_THREE_PHASE(boolean manualDere = false, int8_t derePin = -1);
+  OR_WE_THREE_PHASE(boolean manualDere = false);
 
   //Voltage
   float getVoltageL1();
@@ -446,7 +443,7 @@ protected:
 class OR_WE_THREE_PHASE_TARIFF : public OR_WE_THREE_PHASE
 {
 public:
-  OR_WE_THREE_PHASE_TARIFF(boolean manualDere = false, int8_t derePin = -1);
+  OR_WE_THREE_PHASE_TARIFF(boolean manualDere = false);
 
   //Other
   HolidayWeekendConfig_t getHolidayWeekendTariff();
