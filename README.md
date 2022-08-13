@@ -13,6 +13,10 @@ This library allows you reading ORNO WE energy meter(s) using:
 
 you also need rs232<->rs485 converter:
 - [x] with automatic flow direction control
+- [x] *WITHOUT* automatic flow direction control
+
+
+Default DeRe Pin is D6 (NodeMCU) - in the OR_WE.h file you can redefine the Pin for your needs.
 
 ---
 
